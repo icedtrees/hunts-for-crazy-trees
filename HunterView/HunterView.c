@@ -6,7 +6,9 @@
 #include "HunterView.h"
 
 // Format: CitynameTransporttypeCitynameTransporttype...etc.
-#define ADJACENCY {}
+static const char *adjacency[] = {
+// ALICANTE
+
 
 typedef struct _node *Node;
 typedef struct _node {
