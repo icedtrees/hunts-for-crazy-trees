@@ -5,6 +5,9 @@
 #include "game.h"
 #include "HunterView.h"
 
+// Format: CitynameTransporttypeCitynameTransporttype...etc.
+#define ADJACENCY {}
+
 typedef struct _node *Node;
 typedef struct _node {
     int value;
@@ -312,15 +315,12 @@ void getHistory(HunterView currentView, PlayerID player, LocationID trail[TRAIL_
 
 LocationID * connectedLocations(HunterView currentView, int * numLocations, LocationID from, 
                               PlayerID player, Round round, int road, int rail, int sea) {
+    char *adjacency[] = ADJACENCY;
+    if (adjacency) {
+        // do nothing
+    }
     return 0;
 }
-
-
-
-
-
-
-
 
 
 
