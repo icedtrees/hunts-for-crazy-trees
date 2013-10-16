@@ -254,7 +254,6 @@ void testConnectedLocations(void) {
     // Test VALONA by road
     int numAdjacent;
     connectedLocations(game, &numAdjacent, VALONA, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
-    printf("adjacent is %d\n", numAdjacent);
     assert(numAdjacent == 5); // four roads and self
     
     // Test VALONA by rail (no rail move permitted, since turn 0)
@@ -301,8 +300,10 @@ void verifyConnectedLocations(void) {
             }
             assert(locationFound);
             free(roadDestinations2);
+            roadDestinations2 = NULL;
         }
         free(roadDestinations);
+        roadDestinations = NULL;
         
         // Testing rail destinations (1 distance)
         LocationID *railDestinations = connectedLocations(hView, &numDestinations, from, PLAYER_LORD_GODALMING, 1, FALSE, TRUE, FALSE);
@@ -322,8 +323,56 @@ void verifyConnectedLocations(void) {
             }
             assert(locationFound);
             free(railDestinations2);
+            railDestinations2 = NULL;
         }
         free(railDestinations);
+        railDestinations = NULL;
+        
+        // Testing rail destinations (2 distance)
+        LocationID *railDestinationsD2 = connectedLocations(hView, &numDestinations, from, PLAYER_LORD_GODALMING, 2, FALSE, TRUE, FALSE);
+        for (toIndex = 0; toIndex < numDestinations; toIndex++) {
+            LocationID to = railDestinationsD2[toIndex];
+            int numDestinations2;
+            LocationID *railDestinations2 = connectedLocations(hView, &numDestinations2, to, PLAYER_LORD_GODALMING, 2, FALSE, TRUE, FALSE);
+            int locationFound = FALSE;
+            int search;
+            for (search = 0; search < numDestinations2 && !locationFound; search++) {
+                if (railDestinations2[search] == from) {
+                    locationFound = TRUE;
+                }
+            }
+            if (!locationFound) {
+                printf("rail: from is %d, to is %d\n", from, to);
+            }
+            assert(locationFound);
+            free(railDestinations2);
+            railDestinations2 = NULL;
+        }
+        free(railDestinationsD2);
+        railDestinationsD2 = NULL;
+        
+        // Testing rail destinations (3 distance)
+        LocationID *railDestinationsD3 = connectedLocations(hView, &numDestinations, from, PLAYER_LORD_GODALMING, 3, FALSE, TRUE, FALSE);
+        for (toIndex = 0; toIndex < numDestinations; toIndex++) {
+            LocationID to = railDestinationsD3[toIndex];
+            int numDestinations2;
+            LocationID *railDestinations2 = connectedLocations(hView, &numDestinations2, to, PLAYER_LORD_GODALMING, 3, FALSE, TRUE, FALSE);
+            int locationFound = FALSE;
+            int search;
+            for (search = 0; search < numDestinations2 && !locationFound; search++) {
+                if (railDestinations2[search] == from) {
+                    locationFound = TRUE;
+                }
+            }
+            if (!locationFound) {
+                printf("rail: from is %d, to is %d\n", from, to);
+            }
+            assert(locationFound);
+            free(railDestinations2);
+            railDestinations2 = NULL;
+        }
+        free(railDestinationsD3);    
+        railDestinationsD3 = NULL;
         
         // Testing sea destinations
         LocationID *seaDestinations = connectedLocations(hView, &numDestinations, from, PLAYER_LORD_GODALMING, 0, FALSE, FALSE, TRUE);
@@ -343,8 +392,10 @@ void verifyConnectedLocations(void) {
             }
             assert(locationFound);
             free(seaDestinations2);
+            seaDestinations2 = NULL;
         }
         free(seaDestinations);
+        seaDestinations = NULL;
     }
     printf("Passed!\n");
 }
