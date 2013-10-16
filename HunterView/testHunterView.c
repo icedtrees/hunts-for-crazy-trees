@@ -125,7 +125,7 @@ int main(int argc, char * argv[]) {
                       "GSJ.... SBRT... HCG.... MCA.... DD1.VV. "
                       "GSJ.... SBRT... HCGDT.. MCA.... DCD.... "
                       "GSJ.... SBRT... HSJDT.. MCA.... DCD.... "
-                      "GSJ.... SBRT... HSJDT.. MCA.... DCA.... ",
+                      "GSJ.... SBRT... HSJDT.. MCA.... DCA.... "
                       "GSJ.... SBRT... HSJ.... MCA.... DTP....", messages);
     assert(getCurrentPlayer(v) == PLAYER_LORD_GODALMING);
     assert(getLocation(v, PLAYER_LORD_GODALMING) == SARAJEVO);
@@ -160,7 +160,7 @@ int main(int argc, char * argv[]) {
     assert(getLocation(v, PLAYER_DRACULA) == DOUBLE_BACK_5);
     assert(getHealth(v, PLAYER_LORD_GODALMING) == GAME_START_HUNTER_LIFE_POINTS);
     assert(getHealth(v, PLAYER_DR_SEWARD) == GAME_START_HUNTER_LIFE_POINTS);
-    assert(getHealth(v, PLAYER_VAN_HELSING) == GAME_START_HUNTER_LIFE_POINTS - 3);
+    assert(getHealth(v, PLAYER_VAN_HELSING) == GAME_START_HUNTER_LIFE_POINTS);
     assert(getHealth(v, PLAYER_MINA_HARKER) == GAME_START_HUNTER_LIFE_POINTS);
     assert(getHealth(v, PLAYER_DRACULA) == GAME_START_BLOOD_POINTS - 10 - 6);
     assert(getRound(v) == 9);
