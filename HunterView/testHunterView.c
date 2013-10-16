@@ -117,6 +117,30 @@ int main(int argc, char * argv[]) {
     assert(getRound(v) == 6);
     assert(getScore(v) == GAME_START_SCORE - 6 - 26);
     printf("Passed!\n");
+    
+    printf("Test case focusing on dracula teleport and histories...");
+    v = newHunterView("GBE.... SBR.... HLO.... MCA.... DSJ.V.. "
+                      "GSJVD.. SHATT.. HCG.... MCA.... DHA..V. "
+                      "GSJ.... SBR.... HCG.... MCA.... DS?.... "
+                      "GSJ.... SBRT... HCG.... MCA.... DD1.VV. "
+                      "GSJ.... SBRT... HCGDT.. MCA.... DCD.... "
+                      "GSJ.... SBRT... HSJDT.. MCA.... DCD.... "
+                      "GSJ.... SBRT... HSJDT.. MCA.... DCA.... ",
+                      "GSJ.... SBRT... HSJ.... MCA.... DTP....", messages);
+    assert(getCurrentPlayer(v) == PLAYER_LORD_GODALMING);
+    assert(getLocation(v, PLAYER_LORD_GODALMING) == SARAJEVO);
+    assert(getLocation(v, PLAYER_DR_SEWARD) == BERLIN);
+    assert(getLocation(v, PLAYER_VAN_HELSING) == SARAJEVO);
+    assert(getLocation(v, PLAYER_MINA_HARKER) == CADIZ);
+    assert(getLocation(v, PLAYER_DRACULA) == TELEPORT);
+    assert(getHealth(v, PLAYER_LORD_GODALMING) == GAME_START_HUNTER_LIFE_POINTS);
+    assert(getHealth(v, PLAYER_DR_SEWARD) == GAME_START_HUNTER_LIFE_POINTS);
+    assert(getHealth(v, PLAYER_VAN_HELSING) == GAME_START_HUNTER_LIFE_POINTS - 3);
+    assert(getHealth(v, PLAYER_MINA_HARKER) == GAME_START_HUNTER_LIFE_POINTS);
+    assert(getHealth(v, PLAYER_DRACULA) == GAME_START_BLOOD_POINTS - 10 - 4);
+    assert(getRound(v) == 8);
+    assert(getScore(v) == GAME_START_SCORE - 8 - 26);
+    printf("Passed!\n");
 
     printf("All passed! Disposing...\n");
     disposeHunterView(v);
