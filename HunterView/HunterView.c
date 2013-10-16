@@ -5,11 +5,75 @@
 #include "game.h"
 #include "HunterView.h"
 
-// Format: CitynameTransporttypeCitynameTransporttype...etc.
-static const char *adjacency[] = {
-// ALICANTE
-
-
+#define ROAD 0
+#define RAIL_1 1
+#define RAIL_2 2
+#define RAIL_3 3
+#define SEA 2
+#define END -2
+static const int *adjacencyRoad[] = {
+{SARAGOSSA, MADRID, GRANADA, END}, //ALICANTE
+{COLOGNE, BRUSSELS, END}, //AMSTERDAM
+{VALONA, END}, //ATHENS
+{SARAGOSSA, TOULOUSE, END}, //BARCELONA
+{NAPLES, ROME, END}, //BARI
+{, END}, //BELGRADE
+{, END}, //BERLIN
+{NANTES, CLERMONT_FERRAND, TOULOUSE, SARAGOSSA, END}, //BORDEAUX
+{AMSTERDAM, COLOGNE, STRASBOURG, PARIS, LE_HAVRE, END}, //BRUSSELS
+{, END}, //BUCHAREST
+{KLAUSENBERG, SZEGED, VIENNA, ZAGREB, END}, //BUDAPEST
+{GRANADA, MADRID, LISBON, END}, //CADIZ
+{, END}, //CAGLIARI
+{, END}, //CASTLE_DRACULA
+{, END}, //CLERMONT_FERRAND
+{, END}, //COLOGNE
+{, END}, //CONSTANTA
+{GALWAY, END}, //DUBLIN
+{MANCHESTER, END}, //EDINBURGH
+{, END}, //FLORENCE
+{, END}, //FRANKFURT
+{, END}, //GALATZ
+{, END}, //GALWAY
+{, END}, //GENEVA
+{, END}, //GENOA
+{, END}, //GRANADA
+{, END}, //HAMBURG
+{, END}, //ST_JOSEPH_AND_ST_MARYS
+{, END}, //KLAUSENBURG
+{, END}, //LE_HAVRE
+{, END}, //LEIPZIG
+{, END}, //LISBON
+{, END}, //LIVERPOOL
+{, END}, //LONDON
+{, END}, //MADRID
+{, END}, //MANCHESTER
+{, END}, //MARSEILLES
+{, END}, //MILAN
+{, END}, //MUNICH
+{, END}, //NANTES
+{, END}, //NAPLES
+{, END}, //NUREMBURG
+{, END}, //PARIS
+{, END}, //PLYMOUTH
+{, END}, //PRAGUE
+{, END}, //ROME
+{, END}, //SALONICA
+{, END}, //SANTANDER
+{, END}, //SARAGOSSA
+{, END}, //SARAJEVO
+{, END}, //SOFIA
+{, END}, //STRASBOURG
+{, END}, //SWANSEA
+{, END}, //SZEGED
+{, END}, //TOULOUSE
+{, END}, //VALONA
+{, END}, //VARNA
+{, END}, //VENICE
+{, END}, //VIENNA
+{, END}, //ZAGREB
+{, END} //ZURICH
+}
 typedef struct _node *Node;
 typedef struct _node {
     int value;
