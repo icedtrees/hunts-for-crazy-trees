@@ -39,9 +39,9 @@ static const int adjacencyRoad[][NUM_MAP_LOCATIONS] = {
     {CASTLE_DRACULA, GALATZ, BUCHAREST, BELGRADE, SZEGED, BUDAPEST, END}, //KLAUSENBURG
     {BRUSSELS, PARIS, NANTES, END}, //LE_HAVRE
     {BERLIN, NUREMBURG, FRANKFURT, COLOGNE, HAMBURG, END}, //LEIPZIG
-    {SANTANDER, MADRID, LISBON, END}, //LISBON
+    {SANTANDER, MADRID, CADIZ, END}, //LISBON
     {MANCHESTER, SWANSEA, END}, //LIVERPOOL
-    {MANCHESTER, SWANSEA, END}, //LONDON
+    {MANCHESTER, SWANSEA, PLYMOUTH, END}, //LONDON
     {SANTANDER, SARAGOSSA, ALICANTE, GRANADA, CADIZ, LISBON, END}, //MADRID
     {EDINBURGH, LONDON, LIVERPOOL, END}, //MANCHESTER
     {TOULOUSE, CLERMONT_FERRAND, GENEVA, ZURICH, MILAN, GENOA, END}, //MARSEILLES
@@ -58,7 +58,7 @@ static const int adjacencyRoad[][NUM_MAP_LOCATIONS] = {
     {LISBON, SARAGOSSA, MADRID, END}, //SANTANDER
     {MADRID, SANTANDER, BORDEAUX, TOULOUSE, BARCELONA, ALICANTE, END}, //SARAGOSSA
     {ZAGREB, ST_JOSEPH_AND_ST_MARYS, BELGRADE, SOFIA, VALONA, END}, //SARAJEVO
-    {BELGRADE, BUCHAREST, VARNA, SALONICA, SARAJEVO, END}, //SOFIA
+    {BELGRADE, BUCHAREST, VARNA, SALONICA, VALONA, SARAJEVO, END}, //SOFIA
     {PARIS, BRUSSELS, COLOGNE, FRANKFURT, NUREMBURG, MUNICH, ZURICH, GENEVA, END}, //STRASBOURG
     {LIVERPOOL, LONDON, END}, //SWANSEA
     {BUDAPEST, KLAUSENBURG, BELGRADE, ST_JOSEPH_AND_ST_MARYS, ZAGREB, END}, //SZEGED
@@ -375,13 +375,13 @@ static const int adjacencySea[][NUM_MAP_LOCATIONS] = {
     {END}, // VIENNA
     {END}, // ZAGREB
     {END},// ZURICH
-    {EDINBURGH, AMSTERDAM, HAMBURG, ATLANTIC_OCEAN, END}, // NORTH_SEA
+    {EDINBURGH, AMSTERDAM, HAMBURG, ATLANTIC_OCEAN, ENGLISH_CHANNEL, END}, // NORTH_SEA
     {PLYMOUTH, LONDON, LE_HAVRE, NORTH_SEA, ATLANTIC_OCEAN, END},// ENGLISH_CHANNEL
     {DUBLIN, LIVERPOOL, SWANSEA, ATLANTIC_OCEAN, END},// IRISH_SEA
     {GALWAY, LISBON, CADIZ, NORTH_SEA, IRISH_SEA, ENGLISH_CHANNEL, BAY_OF_BISCAY, MEDITERRANEAN_SEA, END},// ATLANTIC_OCEAN
     {NANTES, BORDEAUX, SANTANDER, ATLANTIC_OCEAN, END},// BAY_OF_BISCAY
     {ALICANTE, BARCELONA, MARSEILLES, CAGLIARI, ATLANTIC_OCEAN, TYRRHENIAN_SEA, END},// MEDITERRANEAN_SEA
-    {CAGLIARI, ROME, NAPLES, MEDITERRANEAN_SEA, IONIAN_SEA, END},// TYRRHENIAN_SEA
+    {CAGLIARI, GENOA, ROME, NAPLES, MEDITERRANEAN_SEA, IONIAN_SEA, END},// TYRRHENIAN_SEA
     {VALONA, ATHENS, SALONICA, TYRRHENIAN_SEA, ADRIATIC_SEA, END},// IONIAN_SEA
     {VENICE, BARI, IONIAN_SEA, END},// ADRIATIC_SEA
     {CONSTANTA, VARNA, END},// BLACK_SEA
@@ -693,15 +693,19 @@ LocationID * connectedLocations(HunterView currentView, int *numLocations, Locat
     // include current city
     result[adjacentLocations] = from;
     adjacentLocations ++;
-    for (i = 0; adjacencyRoad[from][i] != END; i++) {
-        result[adjacentLocations] = adjacencyRoad[from][i];
-        adjacentLocations++;
+    if (road) {
+        for (i = 0; adjacencyRoad[from][i] != END; i++) {
+            result[adjacentLocations] = adjacencyRoad[from][i];
+            adjacentLocations++;
+        }
     }
-    for (i = 0; adjacencySea[from][i] != END; i++) {
-        result[adjacentLocations] = adjacencySea[from][i];
-        adjacentLocations++;
+    if (sea) {
+        for (i = 0; adjacencySea[from][i] != END; i++) {
+            result[adjacentLocations] = adjacencySea[from][i];
+            adjacentLocations++;
+        }
     }
-    if (player != PLAYER_DRACULA) {
+    if (rail && player != PLAYER_DRACULA) {
         if (round % 4 == 1) {
             for (i = 0; adjacencyRail1[from][i] != END; i++) {
                 result[adjacentLocations] = adjacencyRail1[from][i];

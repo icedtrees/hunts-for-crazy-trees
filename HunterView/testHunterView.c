@@ -8,6 +8,7 @@
 
 void testNewGame(void);
 void testConnectedLocations(void);
+void verifyConnectedLocations(void);
 
 int main(int argc, char * argv[]) {
     playerMessage messages[] = {};
@@ -207,7 +208,7 @@ int main(int argc, char * argv[]) {
     printf("Now running more tests including testing connectedLocations:\n");
     testNewGame();
     testConnectedLocations();
-
+    verifyConnectedLocations();
     return 0;
 }
 
@@ -252,20 +253,21 @@ void testConnectedLocations(void) {
     
     // Test VALONA by road
     int numAdjacent;
-    connectedLocations(game, &numAdjacent, VALONA, PLAYER_LORD_GODALMING, 0, 1, 0, 0);
-    assert(numAdjacent == 4);
+    connectedLocations(game, &numAdjacent, VALONA, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
+    printf("adjacent is %d\n", numAdjacent);
+    assert(numAdjacent == 5); // four roads and self
     
     // Test VALONA by rail (no rail move permitted, since turn 0)
-    connectedLocations(game, &numAdjacent, VALONA, PLAYER_LORD_GODALMING, 0, 0, 1, 0);
-    assert(numAdjacent == 0);
+    connectedLocations(game, &numAdjacent, VALONA, PLAYER_LORD_GODALMING, 0, FALSE, TRUE, FALSE);
+    assert(numAdjacent == 1); // self
     
     // Test SANTANDER by sea
-    connectedLocations(game, &numAdjacent, SANTANDER, PLAYER_LORD_GODALMING, 0, 0, 0, 1);
-    assert(numAdjacent == 2);
+    connectedLocations(game, &numAdjacent, SANTANDER, PLAYER_LORD_GODALMING, 0, FALSE, FALSE, TRUE);
+    assert(numAdjacent == 2); // ocean and self
     
-    // Test ALICANTE by sea
-    connectedLocations(game, &numAdjacent, ALICANTE, PLAYER_LORD_GODALMING, 0, 0, 0, 1);
-    assert(numAdjacent == 3);
+    // Test CAGLIARI by sea 
+    connectedLocations(game, &numAdjacent, CAGLIARI, PLAYER_LORD_GODALMING, 0, FALSE, FALSE, TRUE);
+    assert(numAdjacent == 3); // 2 oceans and self
     
     disposeHunterView(game);
     printf("Testing connected locations passed!\n");
@@ -294,6 +296,9 @@ void verifyConnectedLocations(void) {
                     locationFound = TRUE;
                 }
             }
+            if (!locationFound) {
+                printf("road: from is %d, to is %d\n", from, to);
+            }
             assert(locationFound);
             free(roadDestinations2);
         }
@@ -312,6 +317,9 @@ void verifyConnectedLocations(void) {
                     locationFound = TRUE;
                 }
             }
+            if (!locationFound) {
+                printf("rail: from is %d, to is %d\n", from, to);
+            }
             assert(locationFound);
             free(railDestinations2);
         }
@@ -322,13 +330,16 @@ void verifyConnectedLocations(void) {
         for (toIndex = 0; toIndex < numDestinations; toIndex++) {
             LocationID to = seaDestinations[toIndex];
             int numDestinations2;
-            LocationID *seaDestinations2 = connectedLocations(hView, &numDestinations2, to, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
+            LocationID *seaDestinations2 = connectedLocations(hView, &numDestinations2, to, PLAYER_LORD_GODALMING, 0, FALSE, FALSE, TRUE);
             int locationFound = FALSE;
             int search;
             for (search = 0; search < numDestinations2 && !locationFound; search++) {
                 if (seaDestinations2[search] == from) {
                     locationFound = TRUE;
                 }
+            }
+            if (!locationFound) {
+                printf("sea: from is %d, to is %d\n", from, to);
             }
             assert(locationFound);
             free(seaDestinations2);
