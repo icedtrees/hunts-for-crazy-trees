@@ -93,6 +93,22 @@ int main(int argc, char * argv[]) {
     assert(getHealth(v, PLAYER_DRACULA) == GAME_START_BLOOD_POINTS - 10 - 4);
     assert(getRound(v) == 4);
     assert(getScore(v) == GAME_START_SCORE - 4 - 26);
+    LocationID historyG[] = {SARAJEVO, SARAJEVO, SARAJEVO, SARAJEVO, BELGRADE, -1};
+    LocationID historyS[] = {BERLIN, BERLIN, HAMBURG, BERLIN, -1, -1};
+    LocationID historyH[] = {CAGLIARI, CAGLIARI, CAGLIARI, LONDON, -1, -1};
+    LocationID historyM[] = {CADIZ, CADIZ, CADIZ, CADIZ, -1, -1};
+    LocationID historyD[] = {DOUBLE_BACK_1, SEA_UNKNOWN, HAMBURG, SARAJEVO, -1, -1};
+    LocationID trail[TRAIL_SIZE];
+    getHistory(v, PLAYER_LORD_GODALMING, trail);
+    assert(memcmp(trail, historyG, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_DR_SEWARD, trail);
+    assert(memcmp(trail, historyS, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_VAN_HELSING, trail);
+    assert(memcmp(trail, historyH, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_MINA_HARKER, trail);
+    assert(memcmp(trail, historyM, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_DRACULA, trail);
+    assert(memcmp(trail, historyD, TRAIL_SIZE*sizeof(LocationID)) == 0);
     printf("Passed!\n");
 
     printf("Test case focusing on dracula healing and hunter death...");
@@ -140,6 +156,21 @@ int main(int argc, char * argv[]) {
     assert(getHealth(v, PLAYER_DRACULA) == GAME_START_BLOOD_POINTS - 10 - 4);
     assert(getRound(v) == 8);
     assert(getScore(v) == GAME_START_SCORE - 8 - 26);
+    LocationID historyG2[] = {SARAJEVO, SARAJEVO, SARAJEVO, SARAJEVO, SARAJEVO, SARAJEVO};
+    LocationID historyS2[] = {BERLIN, BERLIN, BERLIN, BERLIN, BERLIN, BERLIN};
+    LocationID historyH2[] = {SARAJEVO, SARAJEVO, SARAJEVO, CAGLIARI, CAGLIARI, CAGLIARI};
+    LocationID historyM2[] = {CADIZ, CADIZ, CADIZ, CADIZ, CADIZ, CADIZ};
+    LocationID historyD2[] = {TELEPORT, CADIZ, CASTLE_DRACULA, CASTLE_DRACULA, DOUBLE_BACK_1, SEA_UNKNOWN};
+    getHistory(v, PLAYER_LORD_GODALMING, trail);
+    assert(memcmp(trail, historyG2, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_DR_SEWARD, trail);
+    assert(memcmp(trail, historyS2, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_VAN_HELSING, trail);
+    assert(memcmp(trail, historyH2, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_MINA_HARKER, trail);
+    assert(memcmp(trail, historyM2, TRAIL_SIZE*sizeof(LocationID)) == 0);
+    getHistory(v, PLAYER_DRACULA, trail);
+    assert(memcmp(trail, historyD2, TRAIL_SIZE*sizeof(LocationID)) == 0);
     printf("Passed!\n");
     
     printf("Test case focusing on dracula double back 5...");

@@ -168,6 +168,9 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
             getHistory(hunterView, curPlayer, history);
             
             realDest = history[movesBack];
+            if (dest == HIDE) {
+                realDest = history[movesBack + 1];
+            }
         }
 
         // add the move and update curLoc
@@ -305,10 +308,7 @@ void getHistory(HunterView currentView, PlayerID player, LocationID trail[TRAIL_
 
 LocationID * connectedLocations(HunterView currentView, int * numLocations, LocationID from, 
                               PlayerID player, Round round, int road, int rail, int sea) {
-    char *adjacency[] = ADJACENCY;
-    if (adjacency) {
-        // do nothing
-    }
+    
     return 0;
 }
 
