@@ -534,13 +534,6 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
         // these only apply to Dracula
         if (dest == HIDE) {
             realDest = curLoc;
-            if (realDest >= DOUBLE_BACK_1 && realDest <= DOUBLE_BACK_5) {
-                int movesBack = realDest - DOUBLE_BACK_1;
-                LocationID history[TRAIL_SIZE];
-                getHistory(hunterView, curPlayer, history);
-                
-                realDest = history[movesBack + 1];
-            }
         } else if (dest >= DOUBLE_BACK_1 && dest <= DOUBLE_BACK_5) {
             int movesBack = dest - DOUBLE_BACK_1;
             printf("%d\n", movesBack);
@@ -569,7 +562,7 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
                 (realDest >= NORTH_SEA && realDest <= BLACK_SEA)) {
                 printf("Dracula losing health\n");
                 hunterView->players[curPlayer]->health -= 2;
-            } else if (realDest == CASTLE_DRACULA) {
+            } else if (realDest == CASTLE_DRACULA || realDest == TELEPORT) {
                 hunterView->players[curPlayer]->health += 10;
             }
         } else {
