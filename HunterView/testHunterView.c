@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 #include <string.h>
 #include "cities.h"
@@ -273,19 +274,19 @@ void testConnectedLocations(void) {
 void verifyConnectedLocations(void) {
     printf("Verifying that connections go both ways...\n");
     char *pastPlays = "";
-    char *messages = "";
+    playerMessage messages[] = {};
     HunterView hView = newHunterView(pastPlays, messages);
-    locationID from;
+    LocationID from;
     for (from = 0; from < NUM_MAP_LOCATIONS; from++) {
         int numDestinations;
         
         // Testing road connections
-        LocationID *roadDestinations = connectedLocations(hView, numDestinations, from, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
+        LocationID *roadDestinations = connectedLocations(hView, &numDestinations, from, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
         int toIndex;
         for (toIndex = 0; toIndex < numDestinations; toIndex++) {
-            locationID to = roadDestinations[toIndex];
+            LocationID to = roadDestinations[toIndex];
             int numDestinations2;
-            LocationID *roadDestinations2 = connectedLocations(hView, numDestinations, to, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
+            LocationID *roadDestinations2 = connectedLocations(hView, &numDestinations2, to, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
             int locationFound = FALSE;
             int search;
             for (search = 0; search < numDestinations2 && !locationFound; search++) {
@@ -296,14 +297,14 @@ void verifyConnectedLocations(void) {
             assert(locationFound);
             free(roadDestinations2);
         }
-        free(roadDestinations)
+        free(roadDestinations);
         
         // Testing rail destinations (1 distance)
-        LocationID *railDestinations = connectedLocations(hView, numDestinations, from, PLAYER_LORD_GODALMING, 1, FALSE, TRUE, FALSE);
+        LocationID *railDestinations = connectedLocations(hView, &numDestinations, from, PLAYER_LORD_GODALMING, 1, FALSE, TRUE, FALSE);
         for (toIndex = 0; toIndex < numDestinations; toIndex++) {
-            locationID to = railDestinations[toIndex];
+            LocationID to = railDestinations[toIndex];
             int numDestinations2;
-            LocationID *railDestinations2 = connectedLocations(hView, numDestinations, to, PLAYER_LORD_GODALMING, 1, FALSE, TRUE, FALSE);
+            LocationID *railDestinations2 = connectedLocations(hView, &numDestinations2, to, PLAYER_LORD_GODALMING, 1, FALSE, TRUE, FALSE);
             int locationFound = FALSE;
             int search;
             for (search = 0; search < numDestinations2 && !locationFound; search++) {
@@ -317,11 +318,11 @@ void verifyConnectedLocations(void) {
         free(railDestinations);
         
         // Testing sea destinations
-        LocationID *seaDestinations = connectedLocations(hView, numDestinations, from, PLAYER_LORD_GODALMING, 0, FALSE, FALSE, TRUE);
+        LocationID *seaDestinations = connectedLocations(hView, &numDestinations, from, PLAYER_LORD_GODALMING, 0, FALSE, FALSE, TRUE);
         for (toIndex = 0; toIndex < numDestinations; toIndex++) {
-            locationID to = seaDestinations[toIndex];
+            LocationID to = seaDestinations[toIndex];
             int numDestinations2;
-            LocationID *seaDestinations2 = connectedLocations(hView, numDestinations, to, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
+            LocationID *seaDestinations2 = connectedLocations(hView, &numDestinations2, to, PLAYER_LORD_GODALMING, 0, TRUE, FALSE, FALSE);
             int locationFound = FALSE;
             int search;
             for (search = 0; search < numDestinations2 && !locationFound; search++) {
