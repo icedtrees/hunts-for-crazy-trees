@@ -9,13 +9,59 @@
 #define TRUE 1
 #define FALSE 0
 
-static int possibleDraculaLocations(HunterView hView, possible[NUM_LOCATIONS]);
+#define MAX_MESSAGE_SIZE 128
 
-void decideMove(HunterView gameState) {
+// static int possibleDraculaLocations(HunterView hView, possible[NUM_LOCATIONS]);
 
-    registerBestPlay("ZU", "I Wanna Stake You Dracula <3" );
+void generateMessage(HunterView hView, char *message);
+char **getDraculaPaths(char **draculaPaths, int *numPaths);
+void getBestMove(char *bestMove, char **draculaPaths, int numPaths);
+
+
+void decideMove(HunterView hView) {
+    // basic
+    char bestMove[3] = "ZU";
+    char message[MAX_MESSAGE_SIZE] = "nice to meet you";
+
+    registerBestPlay(bestMove, message);
+
+    while (TRUE) {
+        // First, get all possible dracula paths
+        int numPaths;
+        char **draculaPaths = getDraculaPaths(draculaPaths, &numPaths);
+        
+        // Use dracula paths to evaluate a best move
+        getBestMove(bestMove, draculaPaths, numPaths);
+        
+        free(draculaPaths);
+        
+        // BM the crap out of other hunters
+        generateMessage(hView, message);
+        
+        // Finally, register best move and message
+        registerBestPlay(bestMove, message);
+    }
 }
 
+void generateMessage (HunterView hView, char *message) {
+    if (getRound(hView) == 0) {
+        strcpy(message, "mid or feed");
+    } else if (getScore(hView) < 100) {
+        strcpy(message, "noob team");
+    } else {
+        strcpy(message, "you guys are ok");
+    }
+}
+
+char **getDraculaPaths(char **draculaPaths, int *numPaths) {
+    return NULL;
+}
+
+void getBestMove(char *bestMove, char **draculaPaths, int numPaths) {
+    return;
+}
+
+/*
 // calculates all of Dracula's possible locations
 // returns 0 if no useful data available
 // returns 1 if some result is achieved
@@ -74,4 +120,4 @@ static int possibleDraculaLocations(HunterView hView, possible[NUM_LOCATIONS]) {
     }
     return usefulData;
 }
-                    
+*/                 
