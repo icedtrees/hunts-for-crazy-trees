@@ -14,30 +14,33 @@
 // static int possibleDraculaLocations(HunterView hView, possible[NUM_LOCATIONS]);
 
 void generateMessage(HunterView hView, char *message);
-char **getDraculaPaths(char **draculaPaths, int *numPaths);
+char **getDraculaTrails(char **draculaPaths, int *numPaths);
 void getBestMove(char *bestMove, char **draculaPaths, int numPaths);
 
 
 void decideMove(HunterView hView) {
-    // basic
+    // backup "default" move for the start
+    // does this move have to be a legal move?
     char bestMove[3] = "ZU";
-    char message[MAX_MESSAGE_SIZE] = "nice to meet you";
-
     registerBestPlay(bestMove, message);
 
+    // BM the crap out of other hunters
+    char message[MAX_MESSAGE_SIZE];
+    generateMessage(hView, message);
+    
+    // Begin analysing the information we have, incrementally analysing deeper
+    // Get initial trails of length 0 (1 city)
+    int numPaths;
+    char **draculaTrails = getDraculaTrails(draculaPaths, &numPaths, 0);
+    int depth = 1; // how deep to take the analysis
     while (TRUE) {
-        // First, get all possible dracula paths
-        int numPaths;
-        char **draculaPaths = getDraculaPaths(draculaPaths, &numPaths);
+        // Use previous dracula trails to incrementally generate more
+        draculaTrails = getDraculaTrails(draculaTrails, &numPaths, depth);
         
-        // Use dracula paths to evaluate a best move
-        getBestMove(bestMove, draculaPaths, numPaths);
+        // Use all possible dracula trails to evaluate a best move
+        getBestMove(bestMove, draculaTrails, numPaths);
         
-        free(draculaPaths);
-        
-        // BM the crap out of other hunters
-        generateMessage(hView, message);
-        
+        free(draculaTrails);        
         // Finally, register best move and message
         registerBestPlay(bestMove, message);
     }
@@ -48,16 +51,22 @@ void generateMessage (HunterView hView, char *message) {
         strcpy(message, "mid or feed");
     } else if (getScore(hView) < 100) {
         strcpy(message, "noob team");
+    } else if (getScore(hView) < 200) {
+        strcpy(message, "semi-retard team");
     } else {
-        strcpy(message, "you guys are ok");
+        strcpy(message, "you guys aren't terrible");
     }
 }
 
-char **getDraculaPaths(char **draculaPaths, int *numPaths) {
+char **getDraculaTrails(char trail[TRAIL_SIZE], int *numPaths, int lengthTrail) {
+    // Accepts trails of length n as input, and generates trails of length n + 1 as output
+    
     return NULL;
 }
 
 void getBestMove(char *bestMove, char **draculaPaths, int numPaths) {
+    // Uses the relevant trail data to predict where dracula could move next, and have the
+    // hunter move accordingly
     return;
 }
 
