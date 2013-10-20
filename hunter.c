@@ -183,7 +183,8 @@ void getBestMove(HunterView hView, char *bestMove, char **draculaPaths, int numP
     }
 
     // Get the first step of the optimal path towards our destination
-    LocationID *pathToTake = shortestPath(hView, getLocation(hView, player), mostLikely);
+    LocationID *pathToTake;
+    int pathLength = shortestPath(hView, getLocation(hView, player), mostLikely, pathToTake);
     LocationID firstStep = pathToTake[0];
     free(pathToTake);
 
