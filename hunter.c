@@ -15,7 +15,9 @@
 
 void generateMessage(HunterView hView, char *message);
 char **getDraculaTrails(char **draculaPaths, int *numPaths);
-void getBestMove(char *bestMove, char **draculaPaths, int numPaths);
+void getBestMove(HunterView hView, char *bestMove, char **draculaPaths, int numPaths);
+
+static int inPath(char *path, LocationID location);
 
 
 void decideMove(HunterView hView) {
@@ -64,10 +66,128 @@ char **getDraculaTrails(char trail[TRAIL_SIZE], int *numPaths, int lengthTrail) 
     return NULL;
 }
 
-void getBestMove(char *bestMove, char **draculaPaths, int numPaths) {
+static int inPath(char *path, LocationID location) {
+    int i;
+    for (i = 0; i < TRAIL_SIZE; i++) {
+        if (path[i] == location) {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+// Recursively go through backtrace and create an array of the path
+// Returns the length of the path
+static int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID *path, int curDistance) {
+    if (curLoc == source) {
+        path = malloc(curDistance * sizeof(LocationID));
+        path[0] = source;
+        return 1;
+    }
+    int len = rPush(source, backtrace[curLoc], backtrace, path, curDistance + 1) + 1;
+    path[len-1] = curLoc;
+
+    return len;
+}
+
+// Returns distance of path and array containing path by reference
+// Returns -1 if no path found
+static int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID *path) {
+    int found = FALSE;
+    int i;
+
+    int seen[NUM_MAP_LOCATIONS];
+    LocationID backtrace[NUM_MAP_LOCATIONS];
+    for (i = 0; i < NUM_MAP_LOCATIONS) {
+        seen[i] = FALSE;
+        backtrace[i] = -1;
+    }
+
+    Queue q = QueueCreate();
+    QueuePush(q, QueueCreateNode(source, source));
+    while (!QueueEmpty(q)) {
+        QueueNode curNode = QueuePop(q);
+        if (seen[curNode.location]) {
+            continue;
+        }
+        seen[curNode.location] = TRUE;
+        backtrace[curNode.location] = curNode.from;
+        if (curNode.location == dest) {
+            found = TRUE;
+            break;
+        }
+
+        int numAdjLocs;
+        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, curLoc, PLAYER_DRACULA,
+                                                 curRound, TRUE, FALSE, TRUE);
+        for (i = 0; i < numAdjLocs; i++) {
+            if (!seen[adjLocs[i]]) {
+                QueuePush(q, QueueCreateNode(adjLocs[i], curNode.location));
+            }
+        }
+    }
+
+    if (found) {
+        return rPush(src, dest, backtrace, path, 1);
+    } else {
+        return -1;
+    }
+}
+
+void getBestMove(HunterView hView, char *bestMove, char **draculaPaths, int numPaths) {
     // Uses the relevant trail data to predict where dracula could move next, and have the
     // hunter move accordingly
-    return;
+
+    // First create a TRUE/FALSE array of possible locations Dracula could be in next turn
+    LocationID possible[NUM_MAP_LOCATIONS];
+    memset(possible, 0, NUM_MAP_LOCATIONS * sizeof(LocationID));
+
+    // Store all the current state information
+    PlayerID player = getCurrentPlayer(hView);
+    Round curRound = getRound(hView);
+
+    // Begin filling in the possible locations array
+    int i;
+    for (i = 0; i < numPaths; i++) {
+        LocationID curLoc = draculaPaths[i][0];
+        int numAdjLocs;
+        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, curLoc, PLAYER_DRACULA,
+                                                 curRound, TRUE, FALSE, TRUE);
+        
+        // For each adjacent location that he could've moved to,
+        // increase the corresponding possible array element
+        // if it doesn't cross back into his trail
+        int j;
+        for (j = 0; j < numAdjLocs; j++) {
+            // TODO check if dracula has doubled back already
+            // and if not, he might be able to double back into his path
+            if (!inPath(draculaPaths[i], adjLoc[j])) {
+                possible[adjLocs[j]]++;
+            }
+        }
+
+        // Don't forget to free adjLocs
+        free(adjLocs);
+    }
+
+    // TODO don't use this strat, improve to a better one
+    // that takes into account distances etc.
+    // Find the most likely location Dracula is at
+    LocationID mostLikely = 0;
+    int highestProb = 0;
+    for (i = 0; i < NUM_MAP_LOCATIONS) {
+        if (possible[i] > highestProb) {
+            highestProb = possible[i];
+            mostLikely = i;
+        }
+    }
+
+    // Get the first step of the optimal path towards our destination
+    LocationID *pathToTake = shortestPath(hView, getLocation(hView, player), mostLikely);
+    LocationID firstStep = pathToTake[0];
+    free(pathToTake);
+
+    return firstStep;
 }
 
 /*
