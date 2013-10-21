@@ -465,11 +465,11 @@ void generateMessage (HunterView hView, char *message) {
     }
 }
 
-LocationID **getDraculaTrails(char histories[NUM_PLAYERS][TRAIL_SIZE], locationID **previousPaths, int *numPaths, int lengthTrail) {
+LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail) {
     // Accepts trails of length n as input, and generates trails of length n + 1 as output
     
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
-    locationID **generatedTrails = malloc(NUM_MAP_LOCATIONS * pow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(*int));
+    LocationID **generatedTrails = malloc(NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(*int));
     int numPrevious = *numPaths;
     *numPaths = 0;
     
@@ -477,63 +477,80 @@ LocationID **getDraculaTrails(char histories[NUM_PLAYERS][TRAIL_SIZE], locationI
     if (lengthTrail == 0) { // previous paths not relevant
         LocationID currentLocation;
         for (currentLocation = 0; currentLocation < NUM_MAP_LOCATIONS; currentLocation ++) {
-            trails[*numPaths] = names[currentLocation];
-            if (validDraculaTrail(histories, names[trails[*numPaths]])) {
+            LocationID *initialTrail = malloc(TRAIL_SIZE * sizeof(int));
+            initialTrail[0] = currentLocation;
+            int i;
+            for (i = 1; i < TRAIL_SIZE; i ++) {
+                initialTrail[i] = -1;
+            }
+            if (validDraculaTrail(histories, initialTrail)) {
+                generatedTrails[*numPaths] = initialTrail;
                 *numPaths ++;
             }
         }
     } else {
-        int i;
-        for (i = 0; i < TODO; i ++) {
-            int lastCity = cityID(previousPaths[i]);
-            locationID *roadLocations = adjacencyRoad(lastCity);
-            int j;
-            for (j = 0; roadLocations[j] != END; j ++) {
-                char *newPath = malloc((lengthTrail + 1) * sizeof(char));
-                strcpy(newPath, previousPaths[i]);
-                strcat(newPath, names[j]);
+        int pathIndex;
+        for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
+            LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
+            LocationID *roadLocations = adjacencyRoad(lastCity);
+            int newIndex;
+            for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
+                LocationID *newPath = malloc((lengthTrail + 1) * sizeof(LocationID));
+                newPath[lengthTrail = adjacencyRoad[lastCity][newIndex];
                 if (validDraculaTrail(histories, newPath)) {
-                    trails[numPaths] = newPath;
-                    numPaths ++;
+                    generatedTrails[*numPaths] = newPath;
+                    *numPaths ++;
                 }
             }
-            locationID *seaLocations = adjacencySea(lastCity);
-            for (j = 0; seaLocations[j] != END; j ++) {
-                char *newPath = malloc((lengthTrail + 1) * sizeof(char));
-                strcpy(newPath, previousPaths[i]);
-                strcat(newPath, names[j]);
+            LocationID *seaLocations = adjacencySea(lastCity);
+            for (newIndex = 0; adjacencySea[lastCity][newIndex] != END; newIndex ++) {
+                LocationID *newPath = malloc((lengthTrail + 1) * sizeof(LocationID));
+                newPath[lengthTrail = adjacencySea[lastCity][newIndex];
                 if (validDraculaTrail(histories, newPath)) {
-                    trails[numPaths] = newPath;
-                    numPaths ++;
+                    generatedTrails[*numPaths] = newPath;
+                    *numPaths ++;
                 }
             }
         }
     }
 
-    return trails;
+    return generatedTrails;
 }
 
-int validDraculaTrail(char histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
+int validDraculaTrail(int histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
     int i;
     for (i = 0; trail[i] != -1; i ++) {
-        if (!
+        // check location is connected to next location
+        if (trail[i + 1] != -1) {
+            if (!validDraculaMove(trail[i], trail[i + 1])) {
+                return FALSE;
+            }
+        }
+        
+        // check it matches dracula history
+/*        if (histories[PLAYER_DRACULA][i] < NUM_MAP_LOCATIONS && histories[PLAYER_DRACULA][i] != trail[i]) {*/
+/*            return FALSE;*/
+/*        } else if (histories[PLAYER_DRACULA[i]*/
     }
+    
+    return TRUE;
 }
 
-int validDraculaMove(locationID from, locationID to, char histories[NUM_PLAYERS][TRAIL_SIZE]) {
+int validDraculaMove(LocationID from, LocationID to, char histories[NUM_PLAYERS][TRAIL_SIZE]) {
     // Function that checks that dracula could have made that move in that specific turn
+    return TRUE; // everything went fine
 }
 
-locationID cityID(char name[3]) {
+LocationID cityID(char name[3]) {
     // Hash function requires 323 bytes of memory; is injective
     return id[primes[name[0] - 'A'] * primes[name[1] - 'A'] * primes[name[1] - 'A']) % 323];
 }
 
-int pow(int base, int index) {
+int intPow(int base, int index) {
     if (index == 0) {
         return 1;
     }
-    return base * pow(base, index - 1);
+    return base * intPow(base, index - 1);
 }
 
 static int inPath(char *path, LocationID location) {
