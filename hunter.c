@@ -413,8 +413,8 @@ static int inPath(char *path, LocationID location);
 
 void decideMove(HunterView hView) {
     // backup "default" move for the start
-    // does this move have to be a legal move?
-    char bestMove[3] = "ZU";
+    // rest
+    char bestMove[3] = names[getLocation(hView, getCurrentPlayer(hView))];
     
     // BM the crap out of other hunters
     char message[MAX_MESSAGE_SIZE];
@@ -422,19 +422,31 @@ void decideMove(HunterView hView) {
     
     registerBestPlay(bestMove, message);
     
+    // Initialise all the histories for all the players
+    int allHistories[NUM_PLAYERS][TRAIL_SIZE];
+    playerID currentPlayer;
+    for (currentPlayer = 0; currentPlayer < NUM_PLAYERS; currentPlayer ++) {
+        getHistory(hView, currentPlayer, allHistories[currentPlayer]);
+    }
+    
     // Begin analysing the information we have, incrementally analysing deeper
     // Get initial trails of length 0 (1 city)
     int numPaths;
-    char **draculaTrails = getDraculaTrails(getHistory(hView), draculaPaths, &numPaths, 0);
-    int depth = 1; // how deep to take the analysis
-    while (TRUE) {
+    int **draculaTrails = getDraculaTrails(allHistories, NULL, &numPaths, 0);
+    int *previousTrails = NULL;
+    
+    int depth; // how deep to take the analysis
+    for (depth = 1; depth <= 6; depth ++) {
+        previousTrails = draculaTrails;
+    
         // Use previous dracula trails to incrementally generate more
-        draculaTrails = getDraculaTrails(draculaTrails, &numPaths, depth);
+        draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
         
         // Use all possible dracula trails to evaluate a best move
         getBestMove(bestMove, draculaTrails, numPaths);
         
-        free(draculaTrails);        
+        free(previousTrails);      
+          
         // Finally, register best move and message
         registerBestPlay(bestMove, message);
     }
@@ -452,14 +464,15 @@ void generateMessage (HunterView hView, char *message) {
     }
 }
 
-char **getDraculaTrails(char histories[NUM_PLAYERS][TRAIL_SIZE], char **previousPaths, int *numPaths, int lengthTrail) {
+LocationID **getDraculaTrails(char histories[NUM_PLAYERS][TRAIL_SIZE], locationID **previousPaths, int *numPaths, int lengthTrail) {
     // Accepts trails of length n as input, and generates trails of length n + 1 as output
     
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
-    char **trails = malloc(NUM_MAP_LOCATIONS * pow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(char *));
+    locationID **generatedTrails = malloc(NUM_MAP_LOCATIONS * pow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(*int));
+    int numPrevious = *numPaths;
     *numPaths = 0;
     
-    // First, generate all the possible trails
+    // Generate all the possible trails
     if (lengthTrail == 0) { // previous paths not relevant
         LocationID currentLocation;
         for (currentLocation = 0; currentLocation < NUM_MAP_LOCATIONS; currentLocation ++) {
@@ -471,14 +484,43 @@ char **getDraculaTrails(char histories[NUM_PLAYERS][TRAIL_SIZE], char **previous
     } else {
         int i;
         for (i = 0; i < TODO; i ++) {
-            locationID *locations = cityID(previousPaths[i])
+            int lastCity = cityID(previousPaths[i]);
+            locationID *roadLocations = adjacencyRoad(lastCity);
+            int j;
+            for (j = 0; roadLocations[j] != END; j ++) {
+                char *newPath = malloc((lengthTrail + 1) * sizeof(char));
+                strcpy(newPath, previousPaths[i]);
+                strcat(newPath, names[j]);
+                if (validDraculaTrail(histories, newPath)) {
+                    trails[numPaths] = newPath;
+                    numPaths ++;
+                }
+            }
+            locationID *seaLocations = adjacencySea(lastCity);
+            for (j = 0; seaLocations[j] != END; j ++) {
+                char *newPath = malloc((lengthTrail + 1) * sizeof(char));
+                strcpy(newPath, previousPaths[i]);
+                strcat(newPath, names[j]);
+                if (validDraculaTrail(histories, newPath)) {
+                    trails[numPaths] = newPath;
+                    numPaths ++;
+                }
+            }
         }
     }
 
     return trails;
 }
 
-int validDraculaTrail(char histories[NUM_PLAYERS][TRAIL_SIZE], char *trail) {
+int validDraculaTrail(char histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
+    int i;
+    for (i = 0; trail[i] != -1; i ++) {
+        if (!
+    }
+}
+
+int validDraculaMove(locationID from, locationID to, char histories[NUM_PLAYERS][TRAIL_SIZE]) {
+    // Function that checks that dracula could have made that move in that specific turn
 }
 
 locationID cityID(char name[3]) {
