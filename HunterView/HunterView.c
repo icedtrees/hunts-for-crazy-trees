@@ -473,8 +473,7 @@ static LocationID moveID(char a, char b) {
         "NS", "EC", "IS", "AO", "BB", "MS", "TS", "IO", "AS", "BS",
         // misc
         "C?", "S?", "HI", "D1", "D2", "D3", "D4", "D5", "TP"
-    };
-    
+    };    
     int i;
     for (i = 0; i < NUM_LOCATIONS; i++) {
         if (strcmp(move, locations[i]) == 0) {
@@ -687,7 +686,9 @@ LocationID * connectedLocations(HunterView currentView, int *numLocations, Locat
     if (road) {
         for (i = 0; adjacencyRoad[from][i] != END; i++) {
             result[adjacentLocations] = adjacencyRoad[from][i];
-            adjacentLocations++;
+            if (player != PLAYER_DRACULA || result[adjacentLocations] != ST_JOSEPH_AND_ST_MARYS) {
+                adjacentLocations++; // dracula cannot go there
+            }
         }
     }
     if (sea) {
