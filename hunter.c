@@ -531,6 +531,7 @@ int validDraculaTrail(int histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
 /*        if (histories[PLAYER_DRACULA][i] < NUM_MAP_LOCATIONS && histories[PLAYER_DRACULA][i] != trail[i]) {*/
 /*            return FALSE;*/
 /*        } else if (histories[PLAYER_DRACULA[i]*/
+
     }
     
     return TRUE;
@@ -593,26 +594,27 @@ static int shortestPath(HunterView hView, LocationID source, LocationID dest, Lo
     Queue q = QueueCreate();
     QueuePush(q, source, source);
     while (!QueueEmpty(q)) {
-        QueueNode curNode = QueuePop(q);
-        if (seen[curNode.location]) {
+        queueData data = QueuePop(q);
+        if (seen[data.location]) {
             continue;
         }
-        seen[curNode.location] = TRUE;
-        backtrace[curNode.location] = curNode.from;
-        if (curNode.location == dest) {
+        seen[data.location] = TRUE;
+        backtrace[data.location] = data.from;
+        if (data.location == dest) {
             found = TRUE;
             break;
         }
 
         int numAdjLocs;
-        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, curLoc, PLAYER_DRACULA,
-                                                 curRound, TRUE, FALSE, TRUE);
+        // Remember that Dracula can't travel by rail. As a corollary curRound is irrelevant as well
+        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, data.location, PLAYER_DRACULA,
+                                                 0, TRUE, FALSE, TRUE);
         for (i = 0; i < numAdjLocs; i++) {
             if (!seen[adjLocs[i]]) {
-                QueuePush(q, adjLocs[i], curNode.location);
+                QueuePush(q, adjLocs[i], data.location);
             }
         }
-        free(curNode);
+        free(adjLocs);
     }
     QueueDispose(q);
     
@@ -650,7 +652,7 @@ void getBestMove(HunterView hView, char *bestMove, char **draculaPaths, int numP
         for (j = 0; j < numAdjLocs; j++) {
             // TODO check if dracula has doubled back already
             // and if not, he might be able to double back into his path
-            if (!inPath(draculaPaths[i], adjLoc[j])) {
+            if (!inPath(draculaPaths[i], adjLocs[j])) {
                 possible[adjLocs[j]]++;
             }
         }
@@ -664,7 +666,7 @@ void getBestMove(HunterView hView, char *bestMove, char **draculaPaths, int numP
     // Find the most likely location Dracula is at
     LocationID mostLikely = 0;
     int highestProb = 0;
-    for (i = 0; i < NUM_MAP_LOCATIONS) {
+    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
         if (possible[i] > highestProb) {
             highestProb = possible[i];
             mostLikely = i;
@@ -673,9 +675,9 @@ void getBestMove(HunterView hView, char *bestMove, char **draculaPaths, int numP
 
     // Get the first step of the optimal path towards our destination
     LocationID *pathToTake;
-    int pathLength = shortestPath(hView, getLocation(hView, player), mostLikely, pathToTake);
+    shortestPath(hView, getLocation(hView, player), mostLikely, pathToTake);
     LocationID firstStep = pathToTake[0];
     free(pathToTake);
 
-    return firstStep;
+    strcpy(bestMove, names[firstStep]);
 }
