@@ -5,3 +5,5 @@
 // Version: 1.0
      
 void decideMove (HunterView gameState);    // hunter.h
+
+int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID *path);
