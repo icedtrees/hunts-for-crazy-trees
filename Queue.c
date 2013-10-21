@@ -8,8 +8,7 @@
 #include "Queue.h"
 
 struct _queueNode {
-	LocationID location;
-	LocationID from;
+	queueData data;
 	QueueNode next;
 };
 
@@ -50,7 +49,7 @@ void QueuePrint (Queue q) {
 	// free list nodes
 	curr = q->head;
 	while (curr != NULL) {
-		printf("(%d, %d)", curr->location, curr->from);
+		printf("(%d, %d)", curr->data.location, curr->data.from);
 		if (curr->next != NULL) {
 			printf(">");
 		}
@@ -64,8 +63,8 @@ void QueuePush (Queue q, LocationID location, LocationID from) {
 	assert(q != NULL);
 	QueueNode new = malloc(sizeof(queueNode));
 	assert(new != NULL);
-	new->location = location;
-	new->from = from;
+	new->data.location = location;
+	new->data.from = from;
 	new->next = NULL;
 	if (q->head == NULL) {
 		q->head = new;
@@ -77,15 +76,17 @@ void QueuePush (Queue q, LocationID location, LocationID from) {
 }
 
 // remove item from front of Queue
-QueueNode QueuePop (Queue q) {
+queueData QueuePop (Queue q) {
 	assert(q != NULL);
 	assert(q->head != NULL);
 	QueueNode node = q->head;
 	q->head = node->next;
+	queueData data = node->data;
+	free(node);
 	if (q->head == NULL) {
 		q->tail = NULL;
 	}
-	return node;
+	return data;
 }
 
 // check for no items
