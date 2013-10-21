@@ -427,6 +427,8 @@ void decideMove(HunterView hView) {
     
     registerBestPlay(bestMove, message);
     
+    printf("no segfault yet!\n");
+    
     // Initialise all the histories for all the players
     int allHistories[NUM_PLAYERS][TRAIL_SIZE];
     PlayerID currentPlayer;
@@ -434,11 +436,16 @@ void decideMove(HunterView hView) {
         getHistory(hView, currentPlayer, allHistories[currentPlayer]);
     }
     
+    printf("no segfault yet!\n");
+    
     // Begin analysing the information we have, incrementally analysing deeper
     // Get initial trails of length 0 (1 city)
     int numPaths;
     int **draculaTrails = getDraculaTrails(allHistories, NULL, &numPaths, 0);
     int **previousTrails = NULL;
+    
+    
+    printf("no segfault yet!\n");
     
     int depth; // how deep to take the analysis
     for (depth = 1; depth <= 6; depth ++) {

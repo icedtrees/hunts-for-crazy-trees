@@ -20,10 +20,12 @@ void registerBestPlay(char *play, playerMessage message) {
 
 void testNewGame(void) {
     printf("Testing best move for each hunter on round 0...\n");
-    char *pastPlays = "";
-    playerMessage messages[] = {}; // new game
-    HunterView game = newHunterView(pastPlays, messages);
-    decideMove(game);
+    playerMessage messages[] = {};
+    HunterView game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V..", messages);
+    PlayerID currentPlayer;
+    for (currentPlayer = 0; currentPlayer < NUM_PLAYERS; currentPlayer ++) {
+        decideMove(game);
+    }
     disposeHunterView(game);
     printf("No segfaults have occurred!\n");
 }
