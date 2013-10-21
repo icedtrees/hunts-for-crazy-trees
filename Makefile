@@ -1,7 +1,10 @@
 CC=gcc
 CFLAGS=-Wall -Werror -g
 
-all: testHunterView testHunterView1 testHunterView2 testHunterView3 testHunterView4
+all:
+	gcc -c hunter.c HunterView.c -ljansson
+
+tests: testHunterView testHunterView1 testHunterView2 testHunterView3 testHunterView4
 
 testHunterView : testHunterView.c HunterView.c
 	$(CC) $(CFLAGS) -o testHunterView testHunterView.c HunterView.c
@@ -19,4 +22,4 @@ testHunterView4 : testHunterView4.c HunterView.c
 	$(CC) $(CFLAGS) -o testHunterView4 testHunterView4.c HunterView.c
 
 clean :
-	rm -f testHunterView? *.o core *.dSYM
+	rm -rf myPlayer testHunterView testHunterView? *.o core *.dSYM
