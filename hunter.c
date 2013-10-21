@@ -413,7 +413,7 @@ int validDraculaMove(LocationID from, LocationID to, LocationID histories[NUM_PL
 LocationID cityID(char name[3]);
 int intPow(int base, int index);
 
-static int inPath(LocationID *path, LocationID location);
+int inPath(LocationID *path, LocationID location);
 
 void decideMove(HunterView hView) {
     // backup "default" move for the start
@@ -556,7 +556,7 @@ int intPow(int base, int index) {
     return base * intPow(base, index - 1);
 }
 
-static int inPath(LocationID *path, LocationID location) {
+int inPath(LocationID *path, LocationID location) {
     int i;
     for (i = 0; i < TRAIL_SIZE; i++) {
         if (path[i] == location) {
@@ -568,7 +568,7 @@ static int inPath(LocationID *path, LocationID location) {
 
 // Recursively go through backtrace and create an array of the path
 // Returns the length of the path
-static int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID *path, int curDistance) {
+int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID *path, int curDistance) {
     if (curLoc == source) {
         path = malloc(curDistance * sizeof(LocationID));
         path[0] = source;
@@ -582,7 +582,7 @@ static int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], L
 
 // Returns distance of path and array containing path by reference
 // Returns -1 if no path found
-static int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID *path) {
+int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID *path) {
     int found = FALSE;
     int i;
 

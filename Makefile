@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Werror -g
 
 all:
-	gcc -c hunter.c HunterView.c -ljansson
+	gcc -c hunter.c HunterView.c Queue.c -ljansson
 
 tests: testHunterView testHunterView1 testHunterView2 testHunterView3 testHunterView4
 
