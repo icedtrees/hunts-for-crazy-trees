@@ -7,7 +7,7 @@ all:
 hunterTests: testHunter0
 
 testHunter0: hunter.c testHunter0.c Queue.c
-    $(CC) $(CFLAGS) -o testHunter hunter.c testHunter0.c Queue.c HunterView.c
+	$(CC) $(CFLAGS) -o testHunter hunter.c testHunter0.c Queue.c HunterView.c
 
 hunterViewTests: testHunterView testHunterView1 testHunterView2 testHunterView3 testHunterView4
 
