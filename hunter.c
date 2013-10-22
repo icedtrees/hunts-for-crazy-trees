@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -482,10 +483,15 @@ void generateMessage (HunterView hView, char *message) {
 LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail) {
     // Accepts trails of length n as input, and generates trails of length n + 1 as output
     
+    printf("trying to allocate memory...\n");
+    
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
     LocationID **generatedTrails = malloc(NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(int *));
     int numPrevious = *numPaths;
     *numPaths = 0;
+    
+    printf("%d bytes of memory allocated\n", NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(int *));
+    printf("numprevious is %d\n", numPrevious);
     
     // Generate all the possible trails
     if (lengthTrail == 0) { // previous paths not relevant
@@ -510,11 +516,14 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
             int newIndex;
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
+                printf("newIndex = %d\n", newIndex);
                 LocationID *newPath = malloc((lengthTrail + 1) * sizeof(LocationID));
                 newPath[lengthTrail] = adjacencyRoad[lastCity][newIndex];
                 if (validDraculaTrail(histories, newPath)) {
                     generatedTrails[*numPaths] = newPath;
                     *numPaths = *numPaths + 1;
+                } else {
+                    free(newPath);
                 }
             }
             for (newIndex = 0; adjacencySea[lastCity][newIndex] != END; newIndex ++) {
@@ -523,6 +532,8 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 if (validDraculaTrail(histories, newPath)) {
                     generatedTrails[*numPaths] = newPath;
                     *numPaths = *numPaths + 1;
+                } else {
+                    free(newPath);
                 }
             }
         }
@@ -535,6 +546,8 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
     int i;
     for (i = 0; trail[i] != -1; i ++) {
+        printf("i is %d, trail[i] is %d\n", i, trail[i]);
+        assert(i < 10);
         // check location is connected to next location
         if (trail[i + 1] != -1) {
             if (!validDraculaMove(trail[i], trail[i + 1], histories)) {
