@@ -33,4 +33,4 @@ testHunterView4 : testHunterView4.c HunterView.c
 	$(CC) $(CFLAGS) -o testHunterView4 testHunterView4.c HunterView.c
 
 clean :
-	rm -rf myPlayer testHunterView testHunterView? testHunter? *.o core *.dSYM
+	rm -rf myPlayer testHunterView testHunterView? testHunter? *.o core vgcore.* *.dSYM debug.txt
