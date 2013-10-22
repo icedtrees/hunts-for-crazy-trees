@@ -444,11 +444,18 @@ void decideMove(HunterView hView) {
     int **draculaTrails = getDraculaTrails(allHistories, NULL, &numPaths, 0);
     int **previousTrails = NULL;
     
+    getBestMove(hView, bestMove, draculaTrails, numPaths);
     
     printf("no segfault yet!\n");
     
     int depth; // how deep to take the analysis
-    for (depth = 1; depth < 6; depth ++) {
+    int maxDepth;
+    if (getRound(hView) < 6) {
+        maxDepth = getRound(hView);
+    } else {
+        maxDepth = 6;
+    }
+    for (depth = 1; depth < maxDepth; depth ++) {
         printf("no segfault yet! depth is %d\n", depth);
         previousTrails = draculaTrails;
     
@@ -674,11 +681,18 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     // Begin filling in the possible locations array
     int i;
     for (i = 0; i < numPaths; i++) {
+        printf("Current Dracula path being considered is:");
+        int k;
+        for (k = 0; k < TRAIL_SIZE; k++) {
+            printf("%d(%s) ", draculaPaths[i][k], names[draculaPaths[i][k]]);
+        }
+        printf("\n");
         LocationID curLoc = draculaPaths[i][0];
         int numAdjLocs;
         LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, curLoc, PLAYER_DRACULA,
                                                  curRound, TRUE, FALSE, TRUE);
-        
+        printf("adjLocs pointing to %p\n", adjLocs);
+        printf("Got adjLocs array\n");
         // For each adjacent location that he could've moved to,
         // increase the corresponding possible array element
         // if it doesn't cross back into his trail
@@ -686,16 +700,26 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         for (j = 0; j < numAdjLocs; j++) {
             // TODO check if dracula has doubled back already
             // and if not, he might be able to double back into his path
+            printf("Checking if %s is in path\n", names[adjLocs[j]]);
             if (!inPath(draculaPaths[i], adjLocs[j])) {
+                printf("Nope, adding to possibilities\n");
                 possible[adjLocs[j]]++;
             }
         }
-
+        printf("All done, freeing adjLocs now: adjLocs pointing to %p\n", adjLocs);
         // Don't forget to free adjLocs
         free(adjLocs);
+        printf("Freed\n");
     }
     printf("done!\n");
     
+    printf("Possible places:\n");
+    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
+        if (possible[i]) {
+            printf("%s(%d) ", names[i], possible[i]);
+        }
+    }
+    printf("\n");
     printf("Finding most likely location Dracula is at...");
     // TODO don't use this strat, improve to a better one
     // that takes into account distances etc.
@@ -717,11 +741,12 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     printf("Shortest path function called\n");
     LocationID firstStep = getLocation(hView, player);
     if (pathToTake) {
-       firstStep = pathToTake[0];
-       printf("pathToTake pointing at %p\n", pathToTake);
-       free(pathToTake);
+        firstStep = pathToTake[1];
+        printf("Path found, first step is to %s\n", names[firstStep]);
+        printf("pathToTake pointing at %p\n", pathToTake);
+        free(pathToTake);
     }
-    printf("done!\n");
+    printf("done! - \n");
 
     strcpy(bestMove, names[firstStep]);
 }

@@ -473,7 +473,8 @@ static LocationID moveID(char a, char b) {
         "NS", "EC", "IS", "AO", "BB", "MS", "TS", "IO", "AS", "BS",
         // misc
         "C?", "S?", "HI", "D1", "D2", "D3", "D4", "D5", "TP"
-    };    
+    };
+    
     int i;
     for (i = 0; i < NUM_LOCATIONS; i++) {
         if (strcmp(move, locations[i]) == 0) {
@@ -678,6 +679,7 @@ void getHistory(HunterView currentView, PlayerID player, LocationID trail[TRAIL_
 LocationID * connectedLocations(HunterView currentView, int *numLocations, LocationID from, 
                               PlayerID player, Round round, int road, int rail, int sea) {
     LocationID *result = malloc(NUM_MAP_LOCATIONS * sizeof(LocationID));
+    printf("POINTER: %p\n", result);
     int adjacentLocations = 0;
     int i;
     // include current city
