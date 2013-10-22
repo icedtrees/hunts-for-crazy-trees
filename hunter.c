@@ -447,7 +447,8 @@ void decideMove(HunterView hView) {
     getBestMove(hView, bestMove, draculaTrails, numPaths);
     registerBestPlay(bestMove, message);
     
-    printf("no segfault yet!\n");
+    printf("no segfault yet!\n");// Determines whether Dracula's trail history contains enough information
+    // To make it worth analysing
     
     int depth; // how deep to take the analysis
     int maxDepth;
@@ -477,21 +478,26 @@ void decideMove(HunterView hView) {
     }
 }
 
+// Determines whether Dracula's trail history contains enough information
+// To make it worth analysing
 int enoughInformation(LocationID trail[TRAIL_SIZE]) {
     // TODO improve this function
-    // Determines whether Dracula's trail history contains enough information
-    // To make it worth analysing
     int amountInfo = 0;
     int i;
     for (i = 0; i < TRAIL_SIZE; i++) {
         if (trail[i] == CITY_UNKNOWN) {
+            // Useless (almost)
             amountInfo += 1;
         } else if (trail[i] == SEA_UNKNOWN) {
+            // Only 10 seas, pretty good info
             amountInfo += 5;
         } else if (trail[i] >= ALICANTE && trail[i] <= BLACK_SEA) {
+            // We know for sure where he was at some point - definitely worth it
             amountInfo += 100;
         }
     }
+    
+    // Wow, such arbitrary
     return amountInfo > 10;
 }
 
