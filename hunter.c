@@ -747,7 +747,6 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
         int numAdjLocs;
         LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, data.location, player,
                                                  data.round, TRUE, TRUE, TRUE);
-        int k;
         for (i = 0; i < numAdjLocs; i++) {
             if (!seen[adjLocs[i]]) {
                 QueuePush(q, adjLocs[i], data.location, data.round + 1);
@@ -780,7 +779,6 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     // Begin filling in the possible locations array
     int i;
     for (i = 0; i < numPaths; i++) {
-        int k;
         LocationID curLoc = draculaPaths[i][0];
         int numAdjLocs;
         LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, curLoc, PLAYER_DRACULA,

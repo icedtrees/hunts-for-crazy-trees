@@ -10,7 +10,7 @@
 void testDraculaKnown(void);
 
 int main(int argc, char *argv[]) {
-    testNewGame();
+    testDraculaKnown();
     return EXIT_SUCCESS;
 }
 
