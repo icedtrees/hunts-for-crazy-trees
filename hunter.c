@@ -473,7 +473,6 @@ void generateMessage(HunterView hView, char *message);
 LocationID **getDraculaTrails(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail);
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths);
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail);
-int validDraculaMove(LocationID from, LocationID to, LocationID histories[NUM_PLAYERS][TRAIL_SIZE]);
 LocationID cityID(char name[3]);
 int intPow(int base, int index);
 
@@ -491,7 +490,6 @@ void decideMove(HunterView hView) {
     
     registerBestPlay(bestMove, message);
     
-    printf("no segfault yet!\n");
     
     // Initialise all the histories for all the players
     int allHistories[NUM_PLAYERS][TRAIL_SIZE];
@@ -500,7 +498,6 @@ void decideMove(HunterView hView) {
         getHistory(hView, currentPlayer, allHistories[currentPlayer]);
     }
     
-    printf("no segfault yet!\n");
     
     // Begin analysing the information we have, incrementally analysing deeper
     // Get initial trails of length 0 (1 city)
@@ -511,8 +508,6 @@ void decideMove(HunterView hView) {
     getBestMove(hView, bestMove, draculaTrails, numPaths);
     registerBestPlay(bestMove, message);
     
-    printf("no segfault yet!\n");// Determines whether Dracula's trail history contains enough information
-    // To make it worth analysing
     
     int depth; // how deep to take the analysis
     int maxDepth;
@@ -522,19 +517,21 @@ void decideMove(HunterView hView) {
         maxDepth = 6;
     }
     for (depth = 1; depth < maxDepth; depth ++) {
-        printf("no segfault yet! depth is %d\n", depth);
         previousTrails = draculaTrails;
     
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
         
-        printf("no segfault yet! depth is %d\n", depth);
         
         // Use all possible dracula trails to evaluate a best move
         getBestMove(hView, bestMove, draculaTrails, numPaths);
         
-        printf("best move gotten\n");
         
+        // free previous trails
+        int i;
+        for (i = 0; i < numPaths; i ++) {
+            free(previousTrails[i]);
+        }
         free(previousTrails);      
           
         // Finally, register best move and message
@@ -580,19 +577,15 @@ void generateMessage(HunterView hView, char *message) {
 LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail) {
     // Accepts trails of length n as input, and generates trails of length n + 1 as output
     
-    printf("trying to allocate memory...\n");
     
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
     LocationID **generatedTrails = malloc(NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(int *));
     int numPrevious = *numPaths;
     *numPaths = 0;
     
-    printf("%d bytes of memory allocated\n", NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(int *));
-    printf("numprevious is %d\n", numPrevious);
     
     // Generate all the possible trails
     if (lengthTrail == 0) { // previous paths not relevant
-        printf("trying to generate initial values\n");
         LocationID currentLocation;
         for (currentLocation = 0; currentLocation < NUM_MAP_LOCATIONS; currentLocation ++) {
             LocationID *initialTrail = malloc(TRAIL_SIZE * sizeof(int));
@@ -607,13 +600,12 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             }
         }
     } else {
-        printf("trying to generate values from previous values!\n");
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
             int newIndex;
+            // add all possible land moves
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
-                printf("newIndex = %d\n", newIndex);
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = adjacencyRoad[lastCity][newIndex];
@@ -625,6 +617,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                     free(newPath);
                 }
             }
+            // add all possible sea moves
             for (newIndex = 0; adjacencySea[lastCity][newIndex] != END; newIndex ++) {
                 LocationID *newPath = malloc((lengthTrail + 1) * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
@@ -637,37 +630,53 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                     free(newPath);
                 }
             }
+            // special move: teleport
+            if (histories[PLAYER_DRACULA][0] == TELEPORT) {
+                LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
+                newPath[lengthTrail] = CASTLE_DRACULA;
+                generatedTrails[*numPaths] = newPath;
+                *numPaths = *numPaths + 1;
+            }
         }
     }
 
-    printf("finished generating trails!\n");
     return generatedTrails;
 }
 
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
+    // Given a dracula trail where all cities are adjacent, verifies that it matches histories
+    // and all double backs/hides are legitimate
     int i;
     for (i = 0; i < TRAIL_SIZE; i ++) {
-        printf("i is %d, trail[i] is %d\n", i, trail[i]);
-        // check location is connected to next location
+        // Iterate through the trail dracula has made, check all locations/moves are valid
+        /*
         if (trail[i + 1] != -1) {
-            if (!validDraculaMove(trail[i], trail[i + 1], histories)) {
-                return FALSE;
+            // check that city is not in trail (implement later)
+            if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_1) {
+            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_2) {
+            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_3) {
+            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_4) {
+            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_5) {
+            } else {
             }
         }
+        */
         
-        // check it matches dracula history
-/*        if (histories[PLAYER_DRACULA][i] < NUM_MAP_LOCATIONS && histories[PLAYER_DRACULA][i] != trail[i]) {*/
-/*            return FALSE;*/
-/*        } else if (histories[PLAYER_DRACULA[i]*/
+        // Check that dracula history matches the location in trail
+        if (histories[PLAYER_DRACULA][i] < NUM_MAP_LOCATIONS && histories[PLAYER_DRACULA][i] != trail[i]) {
+            return FALSE;
+        } else if (histories[PLAYER_DRACULA][i] == CITY_UNKNOWN && trail[i] > ZURICH) {
+            return FALSE;
+        } else if (histories[PLAYER_DRACULA][i] == SEA_UNKNOWN && (trail[i] < NORTH_SEA || trail[i] > BLACK_SEA)) {
+            return FALSE;
+        }
 
+        // check that the trail matches the locations of the hunters
+        // do later
     }
     
     return TRUE;
-}
-
-int validDraculaMove(LocationID from, LocationID to, LocationID histories[NUM_PLAYERS][TRAIL_SIZE]) {
-    // Function that checks that dracula could have made that move in that specific turn
-    return TRUE; // everything went fine
 }
 
 LocationID cityID(char name[3]) {
@@ -738,12 +747,7 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
         int numAdjLocs;
         LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, data.location, player,
                                                  data.round, TRUE, TRUE, TRUE);
-        printf("Currently at %s with round %d (player %d) and I can get to:\n", names[data.location], data.round, player);
         int k;
-        for (k = 0; k < numAdjLocs; k++) {
-            printf("%s ", names[adjLocs[k]]);
-        }
-        printf("\n");
         for (i = 0; i < numAdjLocs; i++) {
             if (!seen[adjLocs[i]]) {
                 QueuePush(q, adjLocs[i], data.location, data.round + 1);
@@ -773,22 +777,14 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     PlayerID player = getCurrentPlayer(hView);
     Round curRound = getRound(hView);
     
-    printf("Begin filling in the possible locations array...");
     // Begin filling in the possible locations array
     int i;
     for (i = 0; i < numPaths; i++) {
-        printf("Current Dracula path being considered is:");
         int k;
-        for (k = 0; k < TRAIL_SIZE; k++) {
-            printf("%d(%s) ", draculaPaths[i][k], names[draculaPaths[i][k]]);
-        }
-        printf("\n");
         LocationID curLoc = draculaPaths[i][0];
         int numAdjLocs;
         LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, curLoc, PLAYER_DRACULA,
                                                  curRound, TRUE, FALSE, TRUE);
-        printf("adjLocs pointing to %p\n", adjLocs);
-        printf("Got adjLocs array\n");
         // For each adjacent location that he could've moved to,
         // increase the corresponding possible array element
         // if it doesn't cross back into his trail
@@ -796,27 +792,14 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         for (j = 0; j < numAdjLocs; j++) {
             // TODO check if dracula has doubled back already
             // and if not, he might be able to double back into his path
-            printf("Checking if %s is in path\n", names[adjLocs[j]]);
             if (!inPath(draculaPaths[i], adjLocs[j])) {
-                printf("Nope, adding to possibilities\n");
                 possible[adjLocs[j]]++;
             }
         }
-        printf("All done, freeing adjLocs now: adjLocs pointing to %p\n", adjLocs);
         // Don't forget to free adjLocs
         free(adjLocs);
-        printf("Freed\n");
     }
-    printf("done!\n");
     
-    printf("Possible places:\n");
-    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
-        if (possible[i]) {
-            printf("%s(%d) ", names[i], possible[i]);
-        }
-    }
-    printf("\n");
-    printf("Finding most likely location Dracula is at...");
     // TODO don't use this strat, improve to a better one
     // that takes into account distances etc.
     // Find the most likely location Dracula is at
@@ -828,22 +811,15 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             mostLikely = i;
         }
     }
-    printf("done! - it's %d\n", mostLikely);
     
-    printf("Finding shortest path from %s to %s\n", names[getLocation(hView, player)], names[mostLikely]);
     // Get the first step of the optimal path towards our destination
     LocationID *pathToTake = NULL;
     shortestPath(hView, getLocation(hView, player), mostLikely, &pathToTake);
-    printf("Shortest path function called\n");
     LocationID firstStep = getLocation(hView, player);
     if (pathToTake) {
         firstStep = pathToTake[1];
-        printf("Path found, first step is to %s\n", names[firstStep]);
-        printf("pathToTake pointing at %p\n", pathToTake);
         free(pathToTake);
     }
-    printf("done! - registering %d(%s)\n", firstStep, names[firstStep]);
 
     strcpy(bestMove, names[firstStep]);
-    printf("bestmove is %s\n", bestMove);
 }
