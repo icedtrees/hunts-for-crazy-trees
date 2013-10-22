@@ -654,9 +654,11 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
         seen[i] = FALSE;
         backtrace[i] = -1;
     }
+    Round startRound = getRound(hView);
+    PlayerID player = getCurrentPlayer(hView);
 
     Queue q = QueueCreate();
-    QueuePush(q, source, source);
+    QueuePush(q, source, source, startRound);
     while (!QueueEmpty(q)) {
         queueData data = QueuePop(q);
         if (seen[data.location]) {
@@ -670,12 +672,17 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
         }
 
         int numAdjLocs;
-        // Remember that Dracula can't travel by rail. As a corollary curRound is irrelevant as well
-        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, data.location, PLAYER_DRACULA,
-                                                 0, TRUE, FALSE, TRUE);
+        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, data.location, player,
+                                                 data.round, TRUE, TRUE, TRUE);
+        printf("Currently at %s with round %d (player %d) and I can get to:\n", names[data.location], data.round, player);
+        int k;
+        for (k = 0; k < numAdjLocs; k++) {
+            printf("%s ", names[adjLocs[k]]);
+        }
+        printf("\n");
         for (i = 0; i < numAdjLocs; i++) {
             if (!seen[adjLocs[i]]) {
-                QueuePush(q, adjLocs[i], data.location);
+                QueuePush(q, adjLocs[i], data.location, data.round + 1);
             }
         }
         free(adjLocs);
