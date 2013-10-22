@@ -706,6 +706,7 @@ LocationID * connectedLocations(HunterView currentView, int *numLocations, Locat
             }
         } else if (round % 4 == 2) {
             for (i = 0; adjacencyRail2[from][i] != END; i++) {
+                printf("RAIL2: %d\n", adjacencyRail2[from][i]);
                 result[adjacentLocations] = adjacencyRail2[from][i];
                 adjacentLocations++;
             }        

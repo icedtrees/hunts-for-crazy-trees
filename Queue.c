@@ -59,12 +59,13 @@ void QueuePrint (Queue q) {
 }
 
 // add item at end of Queue 
-void QueuePush (Queue q, LocationID location, LocationID from) {
+void QueuePush (Queue q, LocationID location, LocationID from, Round round) {
 	assert(q != NULL);
 	QueueNode new = malloc(sizeof(queueNode));
 	assert(new != NULL);
 	new->data.location = location;
 	new->data.from = from;
+	new->data.round = round;
 	new->next = NULL;
 	if (q->head == NULL) {
 		q->head = new;

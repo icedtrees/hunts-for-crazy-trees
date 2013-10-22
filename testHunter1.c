@@ -28,7 +28,7 @@ int main (int argc, char **argv) {
    playerMessage messages[] = {};
    HunterView hView = newHunterView("", messages);
    LocationID *path = NULL;
-   int length = shortestPath(hView, ALICANTE, LONDON, &path);
+   int length = shortestPath(hView, BELGRADE, VENICE, &path);
    
    printf("Shortest path: %d\n", length);
    int i;
