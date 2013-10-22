@@ -20,20 +20,39 @@ void registerBestPlay(char *play, playerMessage message) {
 
 void testDraculaKnown(void) {
     printf("Testing best move for each hunter if we know where drac is...\n");
+    printf("godalming:\n");
     playerMessage messages[] = {};
     HunterView game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V..", messages);
     decideMove(game);
     disposeHunterView(game);
     
+    printf("seward:\n");
     game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ....", messages);
     decideMove(game);
     disposeHunterView(game);
     
+    printf("helsing:\n");
     game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ.... SHA....", messages);
     decideMove(game);
     disposeHunterView(game);
     
+    printf("mina:\n");
     game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ.... SHA.... HEC....", messages);
+    decideMove(game);
+    disposeHunterView(game);
+    
+    printf("godalming:\n");
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ.... SHA.... HEC.... MAO.... DC?.T..", messages);
+    decideMove(game);
+    disposeHunterView(game);
+    
+    printf("seward:\n");
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ.... SHA.... HEC.... MAO.... DC?.T..", messages);
+    decideMove(game);
+    disposeHunterView(game);
+    
+    printf("helsing:\n");
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ.... SHA.... HEC.... MAO.... DC?.T..", messages);
     decideMove(game);
     disposeHunterView(game);
     
