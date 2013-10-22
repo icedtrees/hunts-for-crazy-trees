@@ -749,4 +749,5 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     printf("done! - \n");
 
     strcpy(bestMove, names[firstStep]);
+    printf("bestmove is %s\n", bestMove);
 }

@@ -22,10 +22,23 @@ void testNewGame(void) {
     printf("Testing best move for each hunter on round 0...\n");
     playerMessage messages[] = {};
     HunterView game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V..", messages);
-    PlayerID currentPlayer;
-    for (currentPlayer = 0; currentPlayer < NUM_PLAYERS; currentPlayer ++) {
-        decideMove(game);
-    }
+    decideMove(game);
+    disposeHunterView(game);
+    
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
+    decideMove(game);
+    disposeHunterView(game);
+    
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
+    decideMove(game);
+    disposeHunterView(game);
+    
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
+    decideMove(game);
+    disposeHunterView(game);
+    
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
+    decideMove(game);
     disposeHunterView(game);
     printf("No segfaults have occurred!\n");
 }
