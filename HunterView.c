@@ -533,7 +533,6 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
             realDest = curLoc;
         } else if (dest >= DOUBLE_BACK_1 && dest <= DOUBLE_BACK_5) {
             int movesBack = dest - DOUBLE_BACK_1;
-            printf("%d\n", movesBack);
             LocationID history[TRAIL_SIZE];
             getHistory(hunterView, curPlayer, history);
             
@@ -557,7 +556,6 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
             // special cases at end of turn
             if (realDest == SEA_UNKNOWN ||
                 (realDest >= NORTH_SEA && realDest <= BLACK_SEA)) {
-                printf("Dracula losing health\n");
                 hunterView->players[curPlayer]->health -= 2;
             } else if (realDest == CASTLE_DRACULA || realDest == TELEPORT) {
                 hunterView->players[curPlayer]->health += 10;
@@ -706,7 +704,6 @@ LocationID * connectedLocations(HunterView currentView, int *numLocations, Locat
             }
         } else if (round % 4 == 2) {
             for (i = 0; adjacencyRail2[from][i] != END; i++) {
-                printf("RAIL2: %d\n", adjacencyRail2[from][i]);
                 result[adjacentLocations] = adjacencyRail2[from][i];
                 adjacentLocations++;
             }        

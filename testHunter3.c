@@ -21,19 +21,19 @@ void registerBestPlay(char *play, playerMessage message) {
 void testDraculaKnown(void) {
     printf("Testing best move for each hunter if we know where drac is...\n");
     playerMessage messages[] = {};
-    HunterView game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V..", messages);
+    HunterView game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V..", messages);
     decideMove(game);
     disposeHunterView(game);
     
-    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ....", messages);
     decideMove(game);
     disposeHunterView(game);
     
-    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ.... SHA....", messages);
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ.... SHA....", messages);
     decideMove(game);
     disposeHunterView(game);
     
-    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ.... SHA.... HEC....", messages);
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DAL.V.. GSJ.... SHA.... HEC....", messages);
     decideMove(game);
     disposeHunterView(game);
     
