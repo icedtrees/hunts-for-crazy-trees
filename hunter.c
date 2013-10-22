@@ -669,7 +669,8 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     // Store all the current state information
     PlayerID player = getCurrentPlayer(hView);
     Round curRound = getRound(hView);
-
+    
+    printf("Begin filling in the possible locations array...");
     // Begin filling in the possible locations array
     int i;
     for (i = 0; i < numPaths; i++) {
@@ -693,7 +694,9 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         // Don't forget to free adjLocs
         free(adjLocs);
     }
-
+    printf("done!\n");
+    
+    printf("Finding most likely location Dracula is at...");
     // TODO don't use this strat, improve to a better one
     // that takes into account distances etc.
     // Find the most likely location Dracula is at
@@ -705,12 +708,20 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             mostLikely = i;
         }
     }
-
+    printf("done! - it's %d\n", mostLikely);
+    
+    printf("Finding shortest path from %s to %s\n", names[getLocation(hView, player)], names[mostLikely]);
     // Get the first step of the optimal path towards our destination
     LocationID *pathToTake = NULL;
     shortestPath(hView, getLocation(hView, player), mostLikely, &pathToTake);
-    LocationID firstStep = pathToTake[0];
-    free(pathToTake);
+    printf("Shortest path function called\n");
+    LocationID firstStep = getLocation(hView, player);
+    if (pathToTake) {
+       firstStep = pathToTake[0];
+       printf("pathToTake pointing at %p\n", pathToTake);
+       free(pathToTake);
+    }
+    printf("done!\n");
 
     strcpy(bestMove, names[firstStep]);
 }
