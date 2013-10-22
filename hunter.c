@@ -568,21 +568,21 @@ int inPath(LocationID *path, LocationID location) {
 
 // Recursively go through backtrace and create an array of the path
 // Returns the length of the path
-int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID *path, int curDistance) {
+int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID **path, int curDistance) {
     if (curLoc == source) {
-        path = malloc(curDistance * sizeof(LocationID));
-        path[0] = source;
+        *path = malloc(curDistance * sizeof(LocationID));
+        (*path)[0] = source;
         return 1;
     }
     int len = rPush(source, backtrace[curLoc], backtrace, path, curDistance + 1) + 1;
-    path[len-1] = curLoc;
-
+    (*path)[len-1] = curLoc;
+    
     return len;
 }
 
 // Returns distance of path and array containing path by reference
 // Returns -1 if no path found
-int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID *path) {
+int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID **path) {
     int found = FALSE;
     int i;
 
@@ -621,7 +621,8 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
     QueueDispose(q);
     
     if (found) {
-        return rPush(source, dest, backtrace, path, 1);
+        int temp = rPush(source, dest, backtrace, path, 1);
+        return temp;
     } else {
         return -1;
     }
@@ -677,7 +678,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
 
     // Get the first step of the optimal path towards our destination
     LocationID *pathToTake = NULL;
-    shortestPath(hView, getLocation(hView, player), mostLikely, pathToTake);
+    shortestPath(hView, getLocation(hView, player), mostLikely, &pathToTake);
     LocationID firstStep = pathToTake[0];
     free(pathToTake);
 
