@@ -17,15 +17,79 @@
 
 static const char names[NUM_LOCATIONS][3] = {
     // 61 cities
-    "AL", "AM", "AT", "BA", "BI", "BE", "BR", "BO", "BU", "BC",
-    "BD", "CA", "CG", "CD", "CF", "CO", "CN", "DU", "ED", "FL",
-    "FR", "GA", "GW", "GE", "GO", "GR", "HA", "JM", "KL", "LE",
-    "LI", "LS", "LV", "LO", "MA", "MN", "MR", "MI", "MU", "NA",
-    "NP", "NU", "PA", "PL", "PR", "RO", "SA", "SN", "SR", "SJ",
-    "SO", "ST", "SW", "SZ", "TO", "VA", "VR", "VE", "VI", "ZA",
-    "ZU",
+    "AL", // ALICANTE
+    "AM", // AMSTERDAM
+    "AT", // ATHENS
+    "BA", // BARCELONA
+    "BI", // BARI
+    "BE", // BELGRADE
+    "BR", // BERLIN
+    "BO", // BORDEAUX
+    "BU", // BRUSSELS
+    "BC", // BUCHAREST
+    "BD", // BUDAPEST
+    "CA", // CADIZ
+    "CG", // CAGLIARI
+    "CD", // CASTLE_DRACULA
+    "CF", // CLERMONT_FERRAND
+    "CO", // COLOGNE
+    "CN", // CONSTANTA
+    "DU", // DUBLIN
+    "ED", // EDINBURGH
+    "FL", // FLORENCE
+    "FR", // FRANKFURT
+    "GA", // GALATZ
+    "GW", // GALWAY
+    "GE", // GENEVA
+    "GO", // GENOA
+    "GR", // GRANADA
+    "HA", // HAMBURG
+    "JM", // ST_JOSEPH_AND_ST_MARYS
+    "KL", // KLAUSENBURG
+    "LE", // LE_HAVRE
+    "LI", // LEIPZIG
+    "LS", // LISBON
+    "LV", // LIVERPOOL
+    "LO", // LONDON
+    "MA", // MADRID
+    "MN", // MANCHESTER
+    "MR", // MARSEILLES
+    "MI", // MILAN
+    "MU", // MUNICH
+    "NA", // NANTES
+    "NP", // NAPLES
+    "NU", // NUREMBURG
+    "PA", // PARIS
+    "PL", // PLYMOUTH
+    "PR", // PRAGUE
+    "RO", // ROME
+    "SA", // SALONICA
+    "SN", // SANTANDER
+    "SR", // SARAGOSSA
+    "SJ", // SARAJEVO
+    "SO", // SOFIA
+    "ST", // STRASBOURG
+    "SW", // SWANSEA
+    "SZ", // SZEGED
+    "TO", // TOULOUSE
+    "VA", // VALONA
+    "VR", // VARNA
+    "VE", // VENICE
+    "VI", // VIENNA
+    "ZA", // ZAGREB
+    "ZU", // ZURICH
+    
     // 10 seas
-    "NS", "EC", "IS", "AO", "BB", "MS", "TS", "IO", "AS", "BS",
+    "NS", // NORTH_SEA
+    "EC", // ENGLISH_CHANNEL
+    "IS", // IRISH_SEA
+    "AO", // ATLANTIC_OCEAN
+    "BB", // BAY_OF_BISCAY
+    "MS", // MEDITERRANEAN_SEA
+    "TS", // TYRRHENIAN_SEA
+    "IO", // IONIAN_SEA
+    "AS", // ADRIATIC_SEA
+    "BS", // BLACK_SEA
 };
 
 static const int primes[26] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 73, 79, 83, 89, 97, 101, 103};

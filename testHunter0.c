@@ -29,16 +29,13 @@ void testNewGame(void) {
     decideMove(game);
     disposeHunterView(game);
     
-    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ.... SHA....", messages);
     decideMove(game);
     disposeHunterView(game);
     
-    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
+    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ.... SHA.... HEC....", messages);
     decideMove(game);
     disposeHunterView(game);
     
-    game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. GSJ....", messages);
-    decideMove(game);
-    disposeHunterView(game);
     printf("No segfaults have occurred!\n");
 }
