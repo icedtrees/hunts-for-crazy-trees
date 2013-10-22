@@ -427,6 +427,8 @@ void decideMove(HunterView hView) {
     
     registerBestPlay(bestMove, message);
     
+    printf("no segfault yet!\n");
+    
     // Initialise all the histories for all the players
     int allHistories[NUM_PLAYERS][TRAIL_SIZE];
     PlayerID currentPlayer;
@@ -434,18 +436,26 @@ void decideMove(HunterView hView) {
         getHistory(hView, currentPlayer, allHistories[currentPlayer]);
     }
     
+    printf("no segfault yet!\n");
+    
     // Begin analysing the information we have, incrementally analysing deeper
     // Get initial trails of length 0 (1 city)
     int numPaths;
     int **draculaTrails = getDraculaTrails(allHistories, NULL, &numPaths, 0);
     int **previousTrails = NULL;
     
+    
+    printf("no segfault yet!\n");
+    
     int depth; // how deep to take the analysis
     for (depth = 1; depth <= 6; depth ++) {
+        printf("no segfault yet! depth is %d\n", depth);
         previousTrails = draculaTrails;
     
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
+        
+        printf("no segfault yet! depth is %d\n", depth);
         
         // Use all possible dracula trails to evaluate a best move
         getBestMove(hView, bestMove, draculaTrails, numPaths);
@@ -479,6 +489,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     
     // Generate all the possible trails
     if (lengthTrail == 0) { // previous paths not relevant
+        printf("trying to generate initial values\n");
         LocationID currentLocation;
         for (currentLocation = 0; currentLocation < NUM_MAP_LOCATIONS; currentLocation ++) {
             LocationID *initialTrail = malloc(TRAIL_SIZE * sizeof(int));
@@ -493,6 +504,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             }
         }
     } else {
+        printf("trying to generate values from previous values!\n");
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
@@ -516,6 +528,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
         }
     }
 
+    printf("finished generating trails!\n");
     return generatedTrails;
 }
 
