@@ -679,7 +679,6 @@ void getHistory(HunterView currentView, PlayerID player, LocationID trail[TRAIL_
 LocationID * connectedLocations(HunterView currentView, int *numLocations, LocationID from, 
                               PlayerID player, Round round, int road, int rail, int sea) {
     LocationID *result = malloc(NUM_MAP_LOCATIONS * sizeof(LocationID));
-    printf("POINTER: %p\n", result);
     int adjacentLocations = 0;
     int i;
     // include current city
