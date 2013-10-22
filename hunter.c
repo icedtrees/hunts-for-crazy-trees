@@ -445,6 +445,7 @@ void decideMove(HunterView hView) {
     int **previousTrails = NULL;
     
     getBestMove(hView, bestMove, draculaTrails, numPaths);
+    registerBestPlay(bestMove, message);
     
     printf("no segfault yet!\n");
     
@@ -476,7 +477,25 @@ void decideMove(HunterView hView) {
     }
 }
 
-void generateMessage (HunterView hView, char *message) {
+int enoughInformation(LocationID trail[TRAIL_SIZE]) {
+    // TODO improve this function
+    // Determines whether Dracula's trail history contains enough information
+    // To make it worth analysing
+    int amountInfo = 0;
+    int i;
+    for (i = 0; i < TRAIL_SIZE; i++) {
+        if (trail[i] == CITY_UNKNOWN) {
+            amountInfo += 1;
+        } else if (trail[i] == SEA_UNKNOWN) {
+            amountInfo += 5;
+        } else if (trail[i] >= ALICANTE && trail[i] <= BLACK_SEA) {
+            amountInfo += 100;
+        }
+    }
+    return amountInfo > 10;
+}
+
+void generateMessage(HunterView hView, char *message) {
     if (getRound(hView) == 0) {
         strcpy(message, "mid or feed");
     } else if (getScore(hView) < 100) {
@@ -746,7 +765,8 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         printf("pathToTake pointing at %p\n", pathToTake);
         free(pathToTake);
     }
-    printf("done! - \n");
+    printf("done! - registering %d(%s)\n", firstStep, names[firstStep]);
 
     strcpy(bestMove, names[firstStep]);
+    printf("Copied bestMove=%s\n", bestMove);
 }
