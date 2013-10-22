@@ -9,3 +9,4 @@ void decideMove (HunterView gameState);    // hunter.h
 
 // For testing purposes only - remove later
 int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID **path);
+void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths);
