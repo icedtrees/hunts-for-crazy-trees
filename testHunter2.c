@@ -26,7 +26,7 @@ void registerBestPlay(char *play, playerMessage message) {
 
 int main (int argc, char **argv) {
    playerMessage messages[] = {};
-   HunterView hView = newHunterView("", messages);
+   HunterView hView = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V..", messages);
    
    LocationID **draculaPaths;
    draculaPaths = malloc(2 * 4);
@@ -52,6 +52,8 @@ int main (int argc, char **argv) {
    printf("%s\n", bestMove);
    free(draculaPaths[0]);
    free(draculaPaths[1]);
+   free(draculaPaths);
+   disposeHunterView(hView);
    
    return EXIT_SUCCESS;
 }
