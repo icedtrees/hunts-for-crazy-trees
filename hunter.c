@@ -308,6 +308,39 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
     }
 }
 
+// BFS and find the distance from a point to every other point
+void findDistances(HunterView hView, LocationID source, PlayerID player, int distance[NUM_MAP_LOCATIONS]) {
+    int i;
+
+    int seen[NUM_MAP_LOCATIONS];
+    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
+        seen[i] = FALSE;
+    }
+    Round startRound = getRound(hView);
+
+    Queue q = QueueCreate();
+    QueuePush(q, source, source, startRound);
+    while (!QueueEmpty(q)) {
+        queueData data = QueuePop(q);
+        if (seen[data.location]) {
+            continue;
+        }
+        seen[data.location] = TRUE;
+        distance[data.location] = data.round - startRound;
+
+        int numAdjLocs;
+        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, data.location, player,
+                                                 data.round, TRUE, TRUE, TRUE);
+        for (i = 0; i < numAdjLocs; i++) {
+            if (!seen[adjLocs[i]]) {
+                QueuePush(q, adjLocs[i], data.location, data.round + 1);
+            }
+        }
+        free(adjLocs);
+    }
+    QueueDispose(q);
+}
+
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths) {
     // Uses the relevant trail data to predict where dracula could move next, and have the
     // hunter move accordingly
@@ -322,18 +355,28 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
         return;
     }
-
+    
+    int i;
     // Create a probability array of possible locations Dracula could be in this turn
     int probableNow[NUM_MAP_LOCATIONS];
     // Create a probability array of possible locations Dracula could be in next turn
     int probableNext[NUM_MAP_LOCATIONS];
-    // TODO also have array for distance from other hunters
-    // TODO also have array for paths that pass through location
-    int i;
+    // Distance from each hunter
+    int distance[NUM_PLAYERS - 1][NUM_MAP_LOCATIONS];
+    for (i = 0; i < NUM_PLAYERS - 1; i++) {
+        findDistances(hView, playerLoc, i, distance[i]);
+    }
+    // TODO pass frequency...
     for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
         probableNow[i] = 0;
         probableNext[i] = 0;
     }
+    
+    /*printf("Player %d at %s, distances:\n", player, names[playerLoc]);
+    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
+        printf("%s: %d\n", names[i], distance[player][i]);
+    }
+    printf("\n");*/
     
     // Begin filling in the probableNow locations array
     for (i = 0; i < numPaths; i++) {
@@ -375,9 +418,15 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         // If we are next to the location being considered, high chance
         // that we want to investigate it if there's a chance he's right there
         if (inArray(adjLocs, location, numAdjLocs)) {
-            curScore += 5 * probableNow[location];
+            curScore += 500 * probableNow[location];
         }
-        curScore += probableNext[location];
+        curScore += 100 * probableNext[location];
+        int k;
+        for (k = 0; k < NUM_PLAYERS - 1; k++) {
+            if (k != player) {
+                curScore += 10 * distance[k][location];
+            }
+        }
         if (curScore > highScore) {
             highScore = curScore;
             destination = location;
