@@ -404,7 +404,6 @@ struct hunterView {
     PlayerID curPlayer;
     int curScore;
     Player players[NUM_PLAYERS];
-
 };
 
 static Node newNode(LocationID move) {
