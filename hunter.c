@@ -802,7 +802,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             // TODO check if dracula has doubled back already
             // and if not, he might be able to double back into his path
             if (!inArray(draculaPaths[i], adjLocs[j], TRAIL_SIZE)) {
-                probableNext[adjLocs[j]] += probableNow[curLoc];
+                probableNext[adjLocs[j]]++;
             }
         }
         // Don't forget to free adjLocs
@@ -834,7 +834,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     
     // Get the first step of the optimal path towards our destination
     LocationID *pathToTake = NULL;
-    int length = shortestPath(hView, playerLoc, destination, &pathToTake);
+    shortestPath(hView, playerLoc, destination, &pathToTake);
     LocationID firstStep = playerLoc; // Default move
     if (pathToTake) {
         firstStep = pathToTake[1];
