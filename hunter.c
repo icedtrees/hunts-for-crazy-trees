@@ -50,6 +50,7 @@ void decideMove(HunterView hView) {
     // Begin analysing the information we have, incrementally analysing deeper
     // Get initial trails of length 0 (1 city)
     int numPaths;
+    int previousNumPaths;
     int **draculaTrails = getDraculaTrails(allHistories, NULL, &numPaths, 0);
     int **previousTrails = NULL;
     
@@ -65,27 +66,20 @@ void decideMove(HunterView hView) {
         maxDepth = 6;
     }
     for (depth = 1; depth < maxDepth; depth ++) {
-        printf("depth is %d\n", depth);
         previousTrails = draculaTrails;
-    
+        previousNumPaths = numPaths;
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
         
-        printf("trails have been generated\n");
-        printf("numPaths is %d\n", numPaths);
         // Use all possible dracula trails to evaluate a best move
         getBestMove(hView, bestMove, draculaTrails, numPaths);
 
-        printf("best move has been found\n");
-        
         // free previous trails
         int i;
-        for (i = 0; i < numPaths; i ++) {
-            printf("i to be freed is %d\n", i);
+        for (i = 0; i < previousNumPaths; i ++) {
             free(previousTrails[i]);
         }
         free(previousTrails);
-        printf("previous trails have been fred\n");
           
         // Finally, register best move and message
         registerBestPlay(bestMove, message);
@@ -133,8 +127,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
     LocationID **generatedTrails = malloc(NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(LocationID *));
-    printf("number of ints allocated is %d\n", NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail));
-    printf("size of memory allocated is %d\n", NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(LocationID *));
     int numPrevious = *numPaths;
     *numPaths = 0;
     
@@ -186,6 +178,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 }
             }
             // special move: teleport
+            /*
             if (histories[PLAYER_DRACULA][lengthTrail] == TELEPORT) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
@@ -193,6 +186,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 generatedTrails[*numPaths] = newPath;
                 *numPaths = *numPaths + 1;
             }
+            */
         }
     }
 
@@ -329,7 +323,6 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
         return;
     }
-    printf("no segfault yet 1\n");
     // Create a probability array of possible locations Dracula could be in this turn
     int probableNow[NUM_MAP_LOCATIONS];
     // Create a probability array of possible locations Dracula could be in next turn
@@ -346,7 +339,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     for (i = 0; i < numPaths; i++) {
         probableNow[draculaPaths[i][0]]++;
     }
-    printf("no segfault yet 2\n");    
+  
     // Begin filling in the probableNext locations array
     for (i = 0; i < numPaths; i++) {
         LocationID curLoc = draculaPaths[i][0];
@@ -367,7 +360,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         // Don't forget to free adjLocs
         free(adjLocs);
     }
-    printf("no segfault yet 3\n");
+
     // TODO don't use this strat, improve to a better one
     // that takes into account distances etc.
     // Find the most likely location Dracula is at
@@ -391,13 +384,13 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         }
     }
     free(adjLocs);
-    printf("no segfault yet 4\n");
+
     // Get the first step of the optimal path towards our destination
     LocationID firstStep = playerLoc; // Default move
     if (playerLoc != destination) {
         LocationID *pathToTake = NULL;
         int length = shortestPath(hView, playerLoc, destination, &pathToTake);
-        printf("length is %d, pathtotake is %p\n", length, pathToTake);
+
         assert(length > 1);
         if (pathToTake != NULL) {
             firstStep = pathToTake[1];

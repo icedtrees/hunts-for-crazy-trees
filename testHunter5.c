@@ -21,7 +21,7 @@ void registerBestPlay(char *play, playerMessage message) {
 void testDraculaKnown(void) {
     printf("Testing best move for each hunter if we don't know where drac is...\n");
     playerMessage messages[] = {};
-    HunterView game = newHunterView("GBE.... SBR.... HLO.... MCA.... DC?.V.. "
+    HunterView game = newHunterView("GBE.... SBR.... HLO.... MCA.... DLO.V.. "
                          "GSJ.... SHA.... HEC.... MAO.... DC?.T.. "
                          "GSJ.... SHA.... HEC.... MAO.... DC?.T.. "
                          "GSJ.... SHA.... HEC.... MAO.... DC?.T.. "
