@@ -37,6 +37,7 @@ int main (int argc, char **argv) {
    }
    printf("\n");
    free(path);
+   disposeHunterView(hView);
    
    return EXIT_SUCCESS;
 }

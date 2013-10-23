@@ -630,6 +630,7 @@ void disposeHunterView(HunterView toBeDeleted) {
             currentMove = currentMove->next;
             free(previousMove);
         }
+        free(toBeDeleted->players[i]->moves);
         free(toBeDeleted->players[i]);
     }
     free(toBeDeleted);
