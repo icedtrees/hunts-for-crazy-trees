@@ -1,3 +1,7 @@
+// Provides interface functions for all the locations
+
+#include "cities.h"
+
 #ifndef LOCATIONS_H
 #define LOCATIONS_H
 
@@ -7,6 +11,8 @@
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
 
+
+// Array of names
 static const char names[NUM_LOCATIONS][3] = {
     // 61 cities
     "AL", // ALICANTE
@@ -82,6 +88,17 @@ static const char names[NUM_LOCATIONS][3] = {
     "IO", // IONIAN_SEA
     "AS", // ADRIATIC_SEA
     "BS", // BLACK_SEA
+    
+    // Other moves
+    "C?", // CITY_UNKNOWN
+    "S?", // SEA_UNKNOWN
+    "HI", // HIDE
+    "D1", // DOUBLE_BACK_1
+    "D2", // DOUBLE_BACK_2
+    "D3", // DOUBLE_BACK_3
+    "D4", // DOUBLE_BACK_4
+    "D5", // DOUBLE_BACK_5
+    "TP" // TELEPORT
 };
 
 static const int adjacencyRoad[][MAX_CONNECTIONS] = {

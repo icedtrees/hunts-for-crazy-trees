@@ -1,3 +1,7 @@
+// HunterView.c
+// Davy Mao and Leo Huang, October 2013
+// A HunterView implementation that stores data for the hunters
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -6,6 +10,8 @@
 #include "HunterView.h"
 #include "locations.h"
 
+
+// HunterView implementation
 typedef struct _node *Node;
 typedef struct _node {
     int value;
@@ -32,7 +38,6 @@ struct hunterView {
     PlayerID curPlayer;
     int curScore;
     Player players[NUM_PLAYERS];
-
 };
 
 static Node newNode(LocationID move) {
@@ -313,10 +318,11 @@ LocationID * connectedLocations(HunterView currentView, int *numLocations, Locat
     adjacentLocations ++;
     if (road) {
         for (i = 0; adjacencyRoad[from][i] != END; i++) {
-            result[adjacentLocations] = adjacencyRoad[from][i];
-            if (player != PLAYER_DRACULA || result[adjacentLocations] != ST_JOSEPH_AND_ST_MARYS) {
-                adjacentLocations++; // dracula cannot go there
+            if (player == PLAYER_DRACULA && result[adjacentLocations] == ST_JOSEPH_AND_ST_MARYS) {
+                continue; // dracula cannot go there
             }
+            result[adjacentLocations] = adjacencyRoad[from][i];
+            adjacentLocations++;
         }
     }
     if (sea) {
