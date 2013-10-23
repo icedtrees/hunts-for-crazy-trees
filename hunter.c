@@ -774,8 +774,8 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     double probableNext[NUM_MAP_LOCATIONS];
     // TODO also have array for distance from other hunters
     // TODO also have array for paths that pass through location
-    memset(probableNow, 0, NUM_MAP_LOCATIONS * sizeof(LocationID));
-    memset(probableNext, 0, NUM_MAP_LOCATIONS * sizeof(LocationID));
+    memset(probableNow, 0, NUM_MAP_LOCATIONS * sizeof(double));
+    memset(probableNext, 0, NUM_MAP_LOCATIONS * sizeof(double));
 
     // Store all the current state information
     PlayerID player = getCurrentPlayer(hView);
