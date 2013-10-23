@@ -14,6 +14,7 @@
 
 #define MAX_MESSAGE_SIZE 128
 
+
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
 
@@ -22,7 +23,6 @@ void generateMessage(HunterView hView, char *message);
 LocationID **getDraculaTrails(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail);
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths);
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail);
-LocationID cityID(char name[3]);
 int intPow(int base, int index);
 
 int inArray(LocationID *array, LocationID location, int length);
@@ -227,6 +227,7 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
     
     return TRUE;
 }
+
 
 int intPow(int base, int index) {
     if (index == 0) {
