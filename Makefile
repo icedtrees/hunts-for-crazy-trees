@@ -51,5 +51,6 @@ testHunterView4: $(HUNTER_VIEW_DEPENDENCIES) testHunterView4.c
 
 
 # Remove all the temporary files
-clean :
+clean:
 	rm -rf myPlayer testHunterView? testHunter? *.o core vgcore.* *.dSYM debug.txt
+
