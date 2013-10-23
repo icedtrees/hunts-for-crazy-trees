@@ -1,3 +1,7 @@
+// HunterView.c
+// Davy Mao and Leo Huang, October 2013
+// A HunterView implementation that stores data for the hunters
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -6,6 +10,8 @@
 #include "HunterView.h"
 #include "locations.h"
 
+
+// HunterView implementation
 typedef struct _node *Node;
 typedef struct _node {
     int value;
