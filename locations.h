@@ -1,8 +1,11 @@
 #ifndef LOCATIONS_H
-#define CITIES_H
+#define LOCATIONS_H
 
 #define END -2
 #define MAX_CONNECTIONS 20
+
+// When dracula is a in a location, he can travel to a maximum of eight other connected locations
+#define MAX_ADJACENT_LOCATIONS 8
 
 static const char names[NUM_LOCATIONS][3] = {
     // 61 cities
@@ -453,3 +456,6 @@ static const int adjacencySea[][MAX_CONNECTIONS] = {
 };
 
 #endif
+
+// Accepts a string with the name of the city, and returns its LocationID
+LocationID cityID(char name[3]);
