@@ -10,11 +10,11 @@ HUNTER_FILES=$(HUNTER_VIEW_FILES) Queue.c hunter.c
 
 # Compile into object files for the hunter
 all: $(HUNTER_DEPENDENCIES)
-	$(CC) -c $(HUNTER_FILES) -ljansson
+	$(CC) $(CFLAGS) -c $(HUNTER_FILES) -ljansson
 
 
 # Tests for the hunter.c
-hunterTests: testHunter0 testHunter1 testHunter2 testHunter3
+hunterTests: testHunter0 testHunter1 testHunter2 testHunter3 testHunter4
 
 testHunter0: $(HUNTER_DEPENDENCIES) testHunter0.c
 	$(CC) $(CFLAGS) -o testHunter0 $(HUNTER_FILES) testHunter0.c
@@ -28,6 +28,8 @@ testHunter2: $(HUNTER_DEPENDENCIES) testHunter2.c
 testHunter3: $(HUNTER_DEPENDENCIES) testHunter3.c
 	$(CC) $(CFLAGS) -o testHunter3 $(HUNTER_FILES) testHunter3.c
 
+testHunter4: $(HUNTER_DEPENDENCIES) testHunter3.c
+	$(CC) $(CFLAGS) -o testHunter4 $(HUNTER_FILES) testHunter4.c
 
 # Tests for the HunterView.c
 hunterViewTests: testHunterView testHunterView1 testHunterView2 testHunterView3 testHunterView4

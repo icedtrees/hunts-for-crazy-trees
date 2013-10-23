@@ -18,12 +18,6 @@
 #define MAX_ADJACENT_LOCATIONS 8
 
 
-
-static const int primes[26] = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 73, 79, 83, 89, 97, 101, 103};
-static const int id[323] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, 55, -1, -1, 3, -1, 33, -1, -1, -1, 52, -1, 11, -1, -1, -1, -1, -1, -1, 65, -1, -1, 57, -1, 19, -1, -1, -1, -1, -1, -1, -1, 5, -1, -1, -1, -1, -1, 32, -1, 37, -1, -1, -1, -1, 60, -1, 56, -1, -1, 45, -1, -1, -1, -1, 15, -1, 38, -1, -1, 21, 50, -1, 31, -1, -1, -1, 9, 26, -1, -1, -1, 54, -1, 17, -1, -1, 24, -1, -1, -1, 59, -1, -1, -1, -1, -1, -1, 68, -1, -1, -1, -1, -1, -1, -1, -1, 36, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 23, -1, -1, -1, -1, -1, -1, 28, -1, 51, -1, -1, -1, 1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 49, -1, 10, -1, -1, -1, -1, -1, 12, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, 34, -1, -1, 7, -1, -1, -1, -1, 39, -1, 47, 67, -1, -1, -1, -1, -1, 6, -1, 44, -1, -1, -1, -1, -1, -1, -1, -1, -1, 30, -1, -1, 61, -1, -1, 14, -1, 16, -1, 53, -1, 43, -1, -1, -1, -1, 63, -1, 42, -1, -1, -1, 18, -1, -1, 64, -1, -1, -1, -1, 70, -1, -1, 35, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 13, 20, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 69, -1, -1, -1, -1, 66, -1, -1, -1, -1, -1, 46, -1, -1, -1, 25, 41, 48, 62, -1, -1, 29, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 22, -1, -1, -1, -1, -1, 4, -1, -1, -1, 27, -1, -1, 58, -1, -1, -1, -1, -1, 40, -1, -1, -1, 8, -1, -1, -1, -1, -1, -1, -1, -1, -1, 2};
-
-
-
 void generateMessage(HunterView hView, char *message);
 LocationID **getDraculaTrails(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail);
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths);
@@ -71,6 +65,7 @@ void decideMove(HunterView hView) {
         maxDepth = 6;
     }
     for (depth = 1; depth < maxDepth; depth ++) {
+        printf("depth is %d\n", depth);
         previousTrails = draculaTrails;
     
         // Use previous dracula trails to incrementally generate more
@@ -231,11 +226,6 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
     }
     
     return TRUE;
-}
-
-LocationID cityID(char name[3]) {
-    // Hash function requires 323 bytes of memory; is injective
-    return id[(primes[name[0] - 'A'] * primes[name[1] - 'A'] * primes[name[1] - 'A']) % 323];
 }
 
 int intPow(int base, int index) {
