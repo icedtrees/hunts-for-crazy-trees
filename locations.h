@@ -11,6 +11,8 @@
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
 
+
+// Array of names
 static const char names[NUM_LOCATIONS][3] = {
     // 61 cities
     "AL", // ALICANTE
