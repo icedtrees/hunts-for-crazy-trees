@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -498,7 +499,6 @@ void decideMove(HunterView hView) {
         getHistory(hView, currentPlayer, allHistories[currentPlayer]);
     }
     
-    
     // Begin analysing the information we have, incrementally analysing deeper
     // Get initial trails of length 0 (1 city)
     int numPaths;
@@ -767,23 +767,31 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths) {
     // Uses the relevant trail data to predict where dracula could move next, and have the
     // hunter move accordingly
-
-    // Create a probability array of possible locations Dracula could be in this turn
-    double probableNow[NUM_MAP_LOCATIONS];
-    // Create a probability array of possible locations Dracula could be in next turn
-    double probableNext[NUM_MAP_LOCATIONS];
-    // TODO also have array for distance from other hunters
-    // TODO also have array for paths that pass through location
-    memset(probableNow, 0, NUM_MAP_LOCATIONS * sizeof(double));
-    memset(probableNext, 0, NUM_MAP_LOCATIONS * sizeof(double));
-
+    
     // Store all the current state information
     PlayerID player = getCurrentPlayer(hView);
     LocationID playerLoc = getLocation(hView, player);
     Round curRound = getRound(hView);
     
-    // Begin filling in the probableNow locations array
+    // If we don't have a location yet
+    if (playerLoc == UNKNOWN_LOCATION) {
+        strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
+        return;
+    }
+
+    // Create a probability array of possible locations Dracula could be in this turn
+    int probableNow[NUM_MAP_LOCATIONS];
+    // Create a probability array of possible locations Dracula could be in next turn
+    int probableNext[NUM_MAP_LOCATIONS];
+    // TODO also have array for distance from other hunters
+    // TODO also have array for paths that pass through location
     int i;
+    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
+        probableNow[i] = 0;
+        probableNext[i] = 0;
+    }
+    
+    // Begin filling in the probableNow locations array
     for (i = 0; i < numPaths; i++) {
         probableNow[draculaPaths[i][0]]++;
     }
@@ -816,36 +824,41 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, playerLoc, player,
                                              curRound, TRUE, TRUE, TRUE);
     LocationID destination = 0;
-    double highScore = 0;
-    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
-        double curScore = 0;
+    int highScore = 0;
+    LocationID location;
+    for (location = 0; location < NUM_MAP_LOCATIONS; location++) {
+        int curScore = 0;
         // If we are next to the location being considered, high chance
         // that we want to investigate it if there's a chance he's right there
-        if (inArray(adjLocs, i, numAdjLocs)) {
-            curScore += 10 * probableNow[i];
+        if (inArray(adjLocs, location, numAdjLocs)) {
+            curScore += 5 * probableNow[location];
         }
-        curScore += probableNext[i];
+        curScore += probableNext[location];
         if (curScore > highScore) {
             highScore = curScore;
-            destination = i;
+            destination = location;
         }
     }
     free(adjLocs);
     
     // Get the first step of the optimal path towards our destination
-    LocationID *pathToTake = NULL;
-    shortestPath(hView, playerLoc, destination, &pathToTake);
     LocationID firstStep = playerLoc; // Default move
-    if (pathToTake) {
-        firstStep = pathToTake[1];
-        free(pathToTake);
+    if (playerLoc != destination) {
+        LocationID *pathToTake = NULL;
+        int length = shortestPath(hView, playerLoc, destination, &pathToTake);
+        assert(length > 1);
+        if (pathToTake != NULL) {
+            firstStep = pathToTake[1];
+            free(pathToTake);
+        }
+    
+        /*printf("Best place to go is %s\n", names[destination]);
+        printf("Path is: ");
+        for (i = 0; i < length; i++) {
+            printf("%s ", names[pathToTake[i]]);
+        }
+        printf("\n");*/
     }
-    /*printf("Best place to go is %s\n", names[destination]);
-    printf("Path is: ");
-    for (i = 0; i < length; i++) {
-        printf("%s ", names[pathToTake[i]]);
-    }
-    printf("\n");*/
     
     strcpy(bestMove, names[firstStep]);
 }
