@@ -11,6 +11,13 @@
 // a type to contain a message (or taunt) provided by a player
 typedef char playerMessage[MESSAGE_SIZE];
 
+typedef struct gameView *GameView;
+typedef struct hunterView *HunterView;
+typedef int PlayerID;
+typedef int LocationID;
+LocationID gameGetLocation(GameView gView, PlayerID player);
+HunterView gameGetHunterView(GameView gView);
+
 // Registers your best move so far with the game engine.
 // This overrides any previous moves provided by your player.
 //

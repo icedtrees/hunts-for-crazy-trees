@@ -40,8 +40,7 @@ struct hunterView {
     Player players[NUM_PLAYERS];
 };
 
-typedef struct _gameView *GameView;
-typedef struct _gameView {
+struct gameView {
     Round curRound;
     PlayerID curPlayer;
     int curScore;
@@ -52,7 +51,7 @@ typedef struct _gameView {
     char pastPlays[100000];
     int vampireCountdown;
     HunterView hView;
-} gameView;
+};
 
 // Global GameView
 GameView g;
@@ -107,7 +106,7 @@ static Player newPlayer(int health) {
 }
 
 GameView newGameView() {
-    GameView gView = malloc(sizeof(gameView));
+    GameView gView = malloc(sizeof(struct gameView));
     playerMessage messages[] = {};
     gView->pastPlays[0] = 0;
     gView->hView = newHunterView(gView->pastPlays, messages);
@@ -147,7 +146,7 @@ int main(int argc, char **argv) {
             confirmBestPlay();
         } else {
             // IT'S DRACULA AAA
-            //decideMoveDracula(g);
+            //registerBestPlay("CD", "");
             decideMoveDracula(g);
             confirmBestPlay();
         }
@@ -426,4 +425,12 @@ void registerBestPlay(char *play, playerMessage message) {
     printf("GAME: player %d registered %s!\n", g->curPlayer, play);
     strcpy(registeredPlay, play);
     printf("    : saved!\n");
+}
+
+LocationID gameGetLocation(GameView gView, PlayerID player) {
+    return gView->players[player]->curLoc;
+}
+
+HunterView gameGetHunterView(GameView gView) {
+    return gView->hView;
 }
