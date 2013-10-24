@@ -8,7 +8,7 @@
 #define END -2
 #define MAX_CONNECTIONS 20
 
-// When dracula is a in a location, he can travel to a maximum of eight other connected locations
+// Adjacent locations by sea or land
 #define MAX_ADJACENT_LOCATIONS 8
 
 

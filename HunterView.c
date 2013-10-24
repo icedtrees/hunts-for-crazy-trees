@@ -333,17 +333,17 @@ LocationID * connectedLocations(HunterView currentView, int *numLocations, Locat
         }
     }
     if (rail && player != PLAYER_DRACULA) {
-        if (round % 4 == 1) {
+        if ((round + player) % 4 == 1) {
             for (i = 0; adjacencyRail1[from][i] != END; i++) {
                 result[adjacentLocations] = adjacencyRail1[from][i];
                 adjacentLocations++;
             }
-        } else if (round % 4 == 2) {
+        } else if ((round + player) % 4 == 2) {
             for (i = 0; adjacencyRail2[from][i] != END; i++) {
                 result[adjacentLocations] = adjacencyRail2[from][i];
                 adjacentLocations++;
             }        
-        } else if (round % 4 == 3) {
+        } else if ((round + player) % 4 == 3) {
             for (i = 0; adjacencyRail3[from][i] != END; i++) {
                 result[adjacentLocations] = adjacencyRail3[from][i];
                 adjacentLocations++;

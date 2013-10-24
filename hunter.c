@@ -30,10 +30,10 @@ static int inArray(LocationID *array, LocationID location, int length);
 void decideMove(HunterView hView) {
     printf("Player %d: Deciding move\n", getCurrentPlayer(hView));
     // backup "default" move for the start
-    // rest
-    char bestMove[3] = "JM";
+    char bestMove[3] = "JM"; // Start at hospital
     LocationID curLocation = getLocation(hView, getCurrentPlayer(hView));
     if (curLocation != UNKNOWN_LOCATION) {
+        // Otherwise, rest
         strcpy(bestMove, names[getLocation(hView, getCurrentPlayer(hView))]);
     }
     printf("Current location identified: %d(%s)\n", getLocation(hView, getCurrentPlayer(hView)), names[getLocation(hView, getCurrentPlayer(hView))]);
@@ -118,7 +118,9 @@ void generateMessage(HunterView hView, char *message) {
     } else if (getScore(hView) < 100) {
         strcpy(message, "noob team");
     } else if (getScore(hView) < 200) {
-        strcpy(message, "semi-retard team");
+        strcpy(message, "you guys suck");
+    } else if (getScore(hView) < 300) {
+        strcpy(message, "team is failure, uninstall game please");
     } else {
         strcpy(message, "you guys aren't terrible");
     }
@@ -147,6 +149,8 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             if (validDraculaTrail(histories, initialTrail)) {
                 generatedTrails[*numPaths] = initialTrail;
                 *numPaths = *numPaths + 1;
+            } else {
+                free(initialTrail);
             }
         }
     } else {
@@ -181,7 +185,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 }
             }
             // special move: teleport
-            /*
             if (histories[PLAYER_DRACULA][lengthTrail] == TELEPORT) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
@@ -189,7 +192,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 generatedTrails[*numPaths] = newPath;
                 *numPaths = *numPaths + 1;
             }
-            */
+            
         }
     }
 
@@ -202,18 +205,49 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
     int i;
     for (i = 0; i < TRAIL_SIZE; i ++) {
         // Iterate through the trail dracula has made, check all locations/moves are valid
-        /*
-        if (trail[i + 1] != -1) {
-            // check that city is not in trail (implement later)
-            if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_1) {
-            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_2) {
-            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_3) {
-            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_4) {
-            } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_5) {
-            } else {
+        if (trail[i] == UNKNOWN_LOCATION || histories[PLAYER_DRACULA][i] == UNKNOWN_LOCATION) {
+            break;
+        }
+
+        // check that any double backs or hides match, otherwise
+        // check that city is not in trail
+        if (histories[PLAYER_DRACULA][i] == HIDE) {
+            if (i < TRAIL_SIZE - 1 && trail[i] != trail[i + 1]) {
+                return FALSE;
+            } else if (trail[i + 1] >= NORTH_SEA && trail[i + 1] <= BLACK_SEA) {
+                // dracula cannot hide at sea
+                return FALSE;
+            }
+        } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_1) {
+            if (i < TRAIL_SIZE - 1 && trail[i] != trail[i + 1]) {
+                return FALSE;
+            }
+        } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_2) {
+            if (i < TRAIL_SIZE - 2 && trail[i] != trail[i + 2]) {
+                return FALSE;
+            }
+        } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_3) {
+            if (i < TRAIL_SIZE - 3 && trail[i] != trail[i + 3]) {
+                return FALSE;
+            }
+        } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_4) {
+            if (i < TRAIL_SIZE - 4 && trail[i] != trail[i + 4]) {
+                return FALSE;
+            }
+        } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_5) {
+            if (i < TRAIL_SIZE - 5 && trail[i] != trail[i + 5]) {
+                return FALSE;
+            }
+        } else {
+            // check that the city is not in the trail
+            int j;
+            for (j = i + 1; j < TRAIL_SIZE; j ++) {
+                if (trail[i] == trail[j]) {
+                    return FALSE;
+                }
             }
         }
-        */
+
         
         // Check that dracula history matches the location in trail
         if (histories[PLAYER_DRACULA][i] < NUM_MAP_LOCATIONS && histories[PLAYER_DRACULA][i] != trail[i]) {
@@ -224,8 +258,16 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
             return FALSE;
         }
 
-        // check that the trail matches the locations of the hunters
-        // do later
+        // check that the trail matches the locations of the hunters]
+        if (histories[PLAYER_DRACULA][i] == CITY_UNKNOWN) {
+        PlayerID currentPlayer;
+            for (currentPlayer = 0; currentPlayer < NUM_PLAYERS - 1; currentPlayer ++) {
+                // cannot be city unknown if we were in that city
+                if (trail[i] == histories[currentPlayer][i]) {
+                    return FALSE;
+                }
+            }
+        }
     }
     
     return TRUE;
