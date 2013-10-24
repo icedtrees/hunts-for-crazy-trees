@@ -207,6 +207,7 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
             }
             if (hunterView->players[curPlayer]->health <= 0) {
                 // hunter died, full health and tp to hospital
+                hunterView->curScore -= 6;
                 hunterView->players[curPlayer]->health = GAME_START_HUNTER_LIFE_POINTS;
                 hunterView->players[curPlayer]->curLoc = ST_JOSEPH_AND_ST_MARYS;
             } else {

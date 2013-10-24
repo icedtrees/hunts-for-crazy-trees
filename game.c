@@ -1,6 +1,7 @@
 #include "game.h"
 #include "HunterView.h"
 #include "hunter.h"
+#include "locations.h"
 //#include "dracula.h"
 #include <time.h>
 #include <stdlib.h>
@@ -10,7 +11,10 @@
 
 typedef struct _node *Node;
 typedef struct _node {
-    int value;
+    LocationID move;
+    LocationID realLoc;
+    int knownToHunter;
+    int encounters;
     Node next;
     Node prev;
 } node;
@@ -38,18 +42,26 @@ struct hunterView {
 
 typedef struct _gameView *GameView;
 typedef struct _gameView {
+    Round curRound;
+    PlayerID curPlayer;
+    int curScore;
     Player players[NUM_PLAYERS];
+    // Keep track of traps and vampires on the map
+    // +1 per trap and +10 for a vampire
+    int obstacles[NUM_MAP_LOCATIONS];
+    char pastPlays[100000];
+    int vampireCountdown;
     HunterView hView;
 } gameView;
 
 // Global GameView and pastPlays string
 GameView g;
-char realPlays[100000];
-char pastPlays[100000];
 
 static Node newNode(LocationID move) {
     Node n = malloc(sizeof(node));
-    n->value = move;
+    n->move = move;
+    n->knownToHunter = FALSE;
+    n->encounters = 0;
     n->next = NULL;
     n->prev = NULL;
 
@@ -96,11 +108,17 @@ static Player newPlayer(int health) {
 GameView newGameView() {
     GameView gView = malloc(sizeof(gameView));
     playerMessage messages[] = {};
-    realPlays[0] = 0;
-    pastPlays[0] = 0;
-    gView->hView = newHunterView(pastPlays, messages);
+    gView->pastPlays[0] = 0;
+    gView->hView = newHunterView(gView->pastPlays, messages);
+    gView->curRound = 0;
+    gView->curScore = 366;
+    gView->curPlayer = 0;
+    gView->vampireCountdown = -1;
     
     int i;
+    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
+        gView->obstacles[i] = 0;
+    }
     for (i = 0; i < NUM_PLAYERS; i++) {
         if (i == PLAYER_DRACULA) {
             gView->players[i] = newPlayer(GAME_START_BLOOD_POINTS);
@@ -116,6 +134,7 @@ int main(int argc, char **argv) {
     // Create a new empty GameView
     g = newGameView();
     
+    /*
     // While the game isn't over yet
     while (g->hView->curScore > 0 && g->hView->players[PLAYER_DRACULA]->health > 0) {
         if (getCurrentPlayer(g->hView) < PLAYER_DRACULA) {
@@ -134,28 +153,250 @@ int main(int argc, char **argv) {
     } else {
         printf("I don't know what happened but good game everyone\n");
     }
+    */
+    
+    registerBestPlay("BE", "");
+    registerBestPlay("ZU", "");
+    registerBestPlay("AL", "");
+    registerBestPlay("BS", "");
+    registerBestPlay("CD", "");
+    
+    registerBestPlay("SJ", "");
+    registerBestPlay("ST", "");
+    registerBestPlay("SR", "");
+    registerBestPlay("CO", "");
+    
+    printf("%s\n", g->pastPlays);
     
     return EXIT_SUCCESS;
 }
 
-void updateRealPlays(char *realPlays, char *play) {
-    strcat(realPlays, " ");
-    PlayerID curPlayer = getCurrentPlayer(g->hView);
-    if (curPlayer == PLAYER_LORD_GODALMING) {
-        strcat(realPlays, "G");
-    } else if (curPlayer == PLAYER_DR_SEWARD) {
-        strcat(realPlays, "S");
-    } else if (curPlayer == PLAYER_VAN_HELSING) {
-        strcat(realPlays, "H");
-    } else if (curPlayer == PLAYER_MINA_HARKER) {
-        strcat(realPlays, "J");
-    } else if (curPlayer == PLAYER_DRACULA) {
-        strcat(realPlays, "D");
-    }
-    strcat(realPlays, play);
-    char actions[5];
-    actions[0] = 0;
+static LocationID moveID(char a, char b) {
+    char move[3];
+    move[0] = a;
+    move[1] = b;
+    move[2] = '\0';
     
+    // credit to Claudia Tu and Daniel Li for this array
+    char locations[NUM_LOCATIONS][3] = {
+        // 61 cities
+        "AL", "AM", "AT", "BA", "BI", "BE", "BR", "BO", "BU", "BC",
+        "BD", "CA", "CG", "CD", "CF", "CO", "CN", "DU", "ED", "FL",
+        "FR", "GA", "GW", "GE", "GO", "GR", "HA", "JM", "KL", "LE",
+        "LI", "LS", "LV", "LO", "MA", "MN", "MR", "MI", "MU", "NA",
+        "NP", "NU", "PA", "PL", "PR", "RO", "SA", "SN", "SR", "SJ",
+        "SO", "ST", "SW", "SZ", "TO", "VA", "VR", "VE", "VI", "ZA",
+        "ZU",
+        // 10 seas
+        "NS", "EC", "IS", "AO", "BB", "MS", "TS", "IO", "AS", "BS",
+        // misc
+        "C?", "S?", "HI", "D1", "D2", "D3", "D4", "D5", "TP"
+    };
+    
+    int i;
+    for (i = 0; i < NUM_LOCATIONS; i++) {
+        if (strcmp(move, locations[i]) == 0) {
+            // strings are equal, ID found
+            return i;
+        }
+    }
+    
+    // move not found in array
+    fprintf(stderr, "LocationID not found for move %s\n", move);
+    exit(1);
+}
+
+static void generatePastPlays(void) {
+    g->pastPlays[0] = 0;
+    Round round;
+    Node curMove[NUM_PLAYERS];
+    int i;
+    for (i = 0; i < NUM_PLAYERS; i++) {
+        curMove[i] = g->players[i]->moves->first;
+    }
+    for (round = 0; round <= g->curRound; round++) {
+        for (i = 0; i < NUM_PLAYERS; i++) {
+            if (curMove[i] == NULL) {
+                // remove trailing space
+                g->pastPlays[strlen(g->pastPlays) - 1] = 0;
+                return;
+            }
+            if (i == PLAYER_LORD_GODALMING) {
+                strcat(g->pastPlays, "G");
+            } else if (i == PLAYER_DR_SEWARD) {
+                strcat(g->pastPlays, "S");
+            } else if (i == PLAYER_VAN_HELSING) {
+                strcat(g->pastPlays, "H");
+            } else if (i == PLAYER_MINA_HARKER) {
+                strcat(g->pastPlays, "M");
+            } else if (i == PLAYER_DRACULA) {
+                strcat(g->pastPlays, "D");
+            }
+            
+            if (curMove[i]->move >= HIDE) {
+                strcat(g->pastPlays, names[curMove[i]->move]);
+            } else if (curMove[i]->knownToHunter) {
+                strcat(g->pastPlays, names[curMove[i]->move]);
+            } else if (!curMove[i]->knownToHunter) {
+                if (curMove[i]->move <= ZURICH) {
+                    strcat(g->pastPlays, "C?");
+                } else {
+                    strcat(g->pastPlays, "S?");
+                }
+            }
+            strcat(g->pastPlays, ".... ");
+            
+            curMove[i] = curMove[i]->next;
+        }
+    }
+}
+        
+
+static void revealDracula(int turnsAgo) {
+    Player dracula = g->players[PLAYER_DRACULA];
+    Node curr = dracula->moves->last;
+    int i;
+    for (i = 0; i < turnsAgo; i++) {
+        curr = curr->prev;
+    }
+    curr->knownToHunter = TRUE;
+}
+
+static int inPath(LocationID location) {
+    Player dracula = g->players[PLAYER_DRACULA];
+    Node curr = dracula->moves->last;
+    int i;
+    for (i = 0; i < TRAIL_SIZE && curr != NULL; i++) {
+        if (curr->move == location) {
+            return i;
+        }
+        curr = curr->prev;
+    }
+    return -1;
+}
+
+LocationID history(Player player, int turnsAgo) {
+    Node curr = player->moves->last;
+    int i;
+    for (i = 0; i < turnsAgo; i++) {
+        curr = curr->prev;
+    }
+    return curr->move;
+}
+
+void updateGame(char *play) {
+    LocationID playID = moveID(play[0], play[1]);
+    Player player = g->players[g->curPlayer];
+    if (g->curPlayer != PLAYER_DRACULA) {
+        // add the move
+        addMove(player->moves, playID);
+        player->curLoc = playID;
+        player->moves->last->knownToHunter = TRUE;
+        
+        // what's the REAL move? ie where are they REALLY
+        // it's a hunter so it's exactly what they register
+        player->moves->last->realLoc = playID;
+        
+        // check if found dracula's path
+        int turnsAgo = inPath(playID);
+        if (turnsAgo != -1) {
+            // in the path
+            revealDracula(turnsAgo);
+        }
+        
+        // check if any actions
+        if (g->obstacles[playID] > 10) {
+            // encounter immature vamper
+            g->obstacles[playID] -= 10;
+            g->vampireCountdown = -1;
+            player->moves->last->encounters += 10;
+        }
+        while (g->obstacles[playID] > 0 && player->health > 0) {
+            // encounter trap
+            g->obstacles[playID]--;
+            player->health -= 2;
+            player->moves->last->encounters += 1;
+        }
+        if (g->players[PLAYER_DRACULA]->curLoc == playID) {
+            // found dracula
+            if (player->health > 0) {
+                g->players[PLAYER_DRACULA]->health -= 10;
+            }
+            player->health -= 4;
+            player->moves->last->encounters += 100;
+            revealDracula(0);
+        }
+        if (player->health <= 0) {
+            //dead
+            player->health = 9;
+            player->curLoc = ST_JOSEPH_AND_ST_MARYS;
+            g->curScore -= 6;
+        }
+        
+        // did he rest
+        if (playID == player->curLoc) {
+            player->health += 3;
+        }
+    } else {
+        //dracula
+        // add the move
+        addMove(player->moves, playID);
+        
+        // what's the REAL move? ie where are they REALLY
+        // it's a hunter so it's exactly what they register
+        LocationID realMove;
+        if (playID <= BLACK_SEA) {
+            // real city, no change
+            realMove = playID;
+        } else if (playID == HIDE) {
+            realMove = history(player, 1);
+        } else if (playID == DOUBLE_BACK_1) {
+            realMove = history(player, 1);
+        } else if (playID == DOUBLE_BACK_2) {
+            realMove = history(player, 2);
+        } else if (playID == DOUBLE_BACK_3) {
+            realMove = history(player, 3);
+        } else if (playID == DOUBLE_BACK_4) {
+            realMove = history(player, 4);
+        } else if (playID == DOUBLE_BACK_5) {
+            realMove = history(player, 5);
+        } else if (playID == TELEPORT) {
+            realMove = CASTLE_DRACULA;
+        }
+        player->moves->last->realLoc = realMove;
+        player->curLoc = realMove;
+        
+        // run into hunter?
+        int j;
+        for (j = 0; j < PLAYER_DRACULA; j++) {
+            if (g->players[j]->curLoc == realMove) {
+                player->moves->last->knownToHunter = TRUE;
+            }
+        }
+        
+        // check for any actions
+        if (g->curRound > 0 && g->curRound % 13 == 0) {
+            // multiple of 13, releave a vampire
+            g->obstacles[realMove] += 10;
+            g->vampireCountdown = 6;
+        }
+        
+        // increment game things since end of round
+        g->curRound++;
+        g->curScore--;
+    }
+    // increment
+    g->curPlayer = (g->curPlayer + 1) % NUM_PLAYERS;
+    if (g->vampireCountdown > 0) {
+        g->vampireCountdown--;
+    }
+    if (g->vampireCountdown == 0) {
+        g->curScore -= 13;
+        g->vampireCountdown = -1;
+    }
+    
+    generatePastPlays();
+}
     
 
 void registerBestPlay(char *play, playerMessage message) {
@@ -163,12 +404,9 @@ void registerBestPlay(char *play, playerMessage message) {
     disposeHunterView(g->hView);
     
     // Register the new play
-    updateRealPlays(realPlays, play);
-    
-    // Change to a hidden past plays string for hunters
-    convertPlays(realPlays, pastPlays);
+    updateGame(play);
     
     // Create a new hunterView
     playerMessage messages[] = {};
-    g->hView = newHunterView(pastPlays, messages);
+    g->hView = newHunterView(g->pastPlays, messages);
 }
