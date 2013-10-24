@@ -2,7 +2,7 @@
 #include "HunterView.h"
 #include "hunter.h"
 #include "locations.h"
-//#include "dracula.h"
+#include "dracula.h"
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -54,8 +54,9 @@ typedef struct _gameView {
     HunterView hView;
 } gameView;
 
-// Global GameView and pastPlays string
+// Global GameView
 GameView g;
+char registeredPlay[3];
 
 static Node newNode(LocationID move) {
     Node n = malloc(sizeof(node));
@@ -130,20 +131,27 @@ GameView newGameView() {
     return gView;
 }
 
+void confirmBestPlay();
+
 int main(int argc, char **argv) {
     // Create a new empty GameView
     g = newGameView();
     
-    /*
     // While the game isn't over yet
     while (g->hView->curScore > 0 && g->hView->players[PLAYER_DRACULA]->health > 0) {
+        printf("GAME: A new turn! enter to continue..\n");
+        getchar();
         if (getCurrentPlayer(g->hView) < PLAYER_DRACULA) {
             // Current player is a hunter
             decideMove(g->hView);
+            confirmBestPlay();
         } else {
             // IT'S DRACULA AAA
             //decideMoveDracula(g);
+            decideMoveDracula(g);
+            confirmBestPlay();
         }
+        printf("%s\n", g->pastPlays);
     }
     
     if (g->hView->curScore <= 0) {
@@ -153,8 +161,9 @@ int main(int argc, char **argv) {
     } else {
         printf("I don't know what happened but good game everyone\n");
     }
-    */
     
+    
+    /*
     registerBestPlay("BE", "");
     registerBestPlay("ZU", "");
     registerBestPlay("AL", "");
@@ -164,9 +173,8 @@ int main(int argc, char **argv) {
     registerBestPlay("SJ", "");
     registerBestPlay("ST", "");
     registerBestPlay("SR", "");
-    registerBestPlay("CO", "");
-    
-    printf("%s\n", g->pastPlays);
+    registerBestPlay("CD", "");
+    */
     
     return EXIT_SUCCESS;
 }
@@ -397,16 +405,25 @@ void updateGame(char *play) {
     
     generatePastPlays();
 }
-    
 
-void registerBestPlay(char *play, playerMessage message) {
+void confirmBestPlay() {
+    printf("GAME: player %d confirmed move as %s!\n", g->curPlayer, registeredPlay);
     // Free up the old hunter view
     disposeHunterView(g->hView);
+    printf("    : disposed old hunterview\n");
     
     // Register the new play
-    updateGame(play);
+    updateGame(registeredPlay);
+    printf("    : registered new play\n");
     
     // Create a new hunterView
     playerMessage messages[] = {};
     g->hView = newHunterView(g->pastPlays, messages);
+    printf("    : created new hunterview\n");
+}
+
+void registerBestPlay(char *play, playerMessage message) {
+    printf("GAME: player %d registered %s!\n", g->curPlayer, play);
+    strcpy(registeredPlay, play);
+    printf("    : saved!\n");
 }

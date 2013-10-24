@@ -297,7 +297,7 @@ void getHistory(HunterView currentView, PlayerID player, LocationID trail[TRAIL_
         trail[i] = UNKNOWN_LOCATION;
     }
     
-    // starting from the most reccent move
+    // starting from the most recent move
     MoveList moves = currentView->players[player]->moves;
     Node curMove = moves->last;
     

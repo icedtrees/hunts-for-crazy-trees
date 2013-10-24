@@ -28,17 +28,21 @@ int intPow(int base, int index);
 int inArray(LocationID *array, LocationID location, int length);
 
 void decideMove(HunterView hView) {
+    printf("Player %d: Deciding move\n", getCurrentPlayer(hView));
     // backup "default" move for the start
     // rest
-    char bestMove[3];
-    strcpy(bestMove, names[getLocation(hView, getCurrentPlayer(hView))]);
-    
+    char bestMove[3] = "JM";
+    LocationID curLocation = getLocation(hView, getCurrentPlayer(hView));
+    if (curLocation != UNKNOWN_LOCATION) {
+        strcpy(bestMove, names[getLocation(hView, getCurrentPlayer(hView))]);
+    }
+    printf("Current location identified: %d(%s)\n", getLocation(hView, getCurrentPlayer(hView)), names[getLocation(hView, getCurrentPlayer(hView))]);
     // BM the crap out of other hunters
     char message[MAX_MESSAGE_SIZE];
     generateMessage(hView, message);
     
+    printf("Default register %s\n", bestMove);
     registerBestPlay(bestMove, message);
-    
     
     // Initialise all the histories for all the players
     int allHistories[NUM_PLAYERS][TRAIL_SIZE];
@@ -53,10 +57,9 @@ void decideMove(HunterView hView) {
     int previousNumPaths;
     int **draculaTrails = getDraculaTrails(allHistories, NULL, &numPaths, 0);
     int **previousTrails = NULL;
-    
+    printf("Preliminary register %s\n", bestMove);
     getBestMove(hView, bestMove, draculaTrails, numPaths);
     registerBestPlay(bestMove, message);
-    
     
     int depth; // how deep to take the analysis
     int maxDepth;
@@ -70,7 +73,7 @@ void decideMove(HunterView hView) {
         previousNumPaths = numPaths;
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
-
+        printf("Path generated, calculating move\n");
         // Use all possible dracula trails to evaluate a best move
         getBestMove(hView, bestMove, draculaTrails, numPaths);
 
@@ -80,7 +83,7 @@ void decideMove(HunterView hView) {
             free(previousTrails[i]);
         }
         free(previousTrails);
-          
+        printf("Move decided, registering\n");
         // Finally, register best move and message
         registerBestPlay(bestMove, message);
     }
