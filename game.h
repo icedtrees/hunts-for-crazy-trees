@@ -17,6 +17,7 @@ typedef int PlayerID;
 typedef int LocationID;
 LocationID gameGetLocation(GameView gView, PlayerID player);
 HunterView gameGetHunterView(GameView gView);
+void gameGetHistory(GameView gView, PlayerID player, LocationID trail[6]);
 
 // Registers your best move so far with the game engine.
 // This overrides any previous moves provided by your player.

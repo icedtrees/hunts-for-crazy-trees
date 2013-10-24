@@ -12,6 +12,9 @@ HUNTER_FILES=$(HUNTER_VIEW_FILES) Queue.c hunter.c
 all: $(HUNTER_DEPENDENCIES)
 	$(CC) $(CFLAGS) -c $(HUNTER_FILES) -ljansson
 
+# Game.c
+game: $(HUNTER_DEPENDENCIES) game.c dracula.c
+	$(CC) $(CFLAGS) -o game $(HUNTER_FILES) game.c dracula.c
 
 # Tests for the hunter.c
 hunterTests: testHunter0 testHunter1 testHunter2 testHunter3 testHunter4 testHunter5
@@ -55,5 +58,5 @@ testHunterView4: $(HUNTER_VIEW_DEPENDENCIES) testHunterView4.c
 
 # Remove all the temporary files
 clean:
-	rm -rf myPlayer testHunterView? testHunter? *.o core vgcore.* *.dSYM debug.txt
+	rm -rf myPlayer game testHunterView? testHunter? *.o core vgcore.* *.dSYM debug.txt
 

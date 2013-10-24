@@ -372,11 +372,15 @@ void updateGame(char *play) {
         }
         player->moves->last->realLoc = realMove;
         player->curLoc = realMove;
+        if (realMove == CASTLE_DRACULA) {
+            player->moves->last->knownToHunter = TRUE;
+        }
         
         // run into hunter?
         int j;
         for (j = 0; j < PLAYER_DRACULA; j++) {
             if (g->players[j]->curLoc == realMove) {
+                printf("DRACULA RAN INTO A HUNTER =o\n");
                 player->moves->last->knownToHunter = TRUE;
             }
         }
@@ -433,4 +437,23 @@ LocationID gameGetLocation(GameView gView, PlayerID player) {
 
 HunterView gameGetHunterView(GameView gView) {
     return gView->hView;
+}
+
+void gameGetHistory(GameView gView, PlayerID player, LocationID trail[TRAIL_SIZE]) {
+    int i;
+    // set all to UNKNOWN_LOCATION (-1) first
+    for (i = 0; i < TRAIL_SIZE; i++) {
+        trail[i] = UNKNOWN_LOCATION;
+    }
+    
+    // starting from the most recent move
+    MoveList moves = gView->players[player]->moves;
+    Node curMove = moves->last;
+    
+    i = 0;
+    while (curMove != NULL && i < TRAIL_SIZE) {
+        trail[i] = curMove->realLoc;
+        i++;
+        curMove = curMove->prev;
+    }
 }

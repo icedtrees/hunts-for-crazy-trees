@@ -25,7 +25,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail);
 int intPow(int base, int index);
 
-int inArray(LocationID *array, LocationID location, int length);
+static int inArray(LocationID *array, LocationID location, int length);
 
 void decideMove(HunterView hView) {
     printf("Player %d: Deciding move\n", getCurrentPlayer(hView));
@@ -109,7 +109,7 @@ int enoughInformation(LocationID trail[TRAIL_SIZE]) {
     }
     
     // Wow, such arbitrary
-    return amountInfo > 10;
+    return amountInfo > 12;
 }
 
 void generateMessage(HunterView hView, char *message) {
@@ -239,7 +239,7 @@ int intPow(int base, int index) {
     return base * intPow(base, index - 1);
 }
 
-int inArray(LocationID *array, LocationID location, int length) {
+static int inArray(LocationID *array, LocationID location, int length) {
     int i;
     for (i = 0; i < length; i++) {
         if (array[i] == location) {
@@ -356,7 +356,15 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     
     // If we don't have a location yet
     if (playerLoc == UNKNOWN_LOCATION) {
-        strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
+        if (player == PLAYER_LORD_GODALMING) {
+            strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
+        } else if (player == PLAYER_DR_SEWARD) {
+            strcpy(bestMove, names[HAMBURG]);
+        } else if (player == PLAYER_VAN_HELSING) {
+            strcpy(bestMove, names[GENOA]);
+        } else if (player == PLAYER_MINA_HARKER) {
+            strcpy(bestMove, names[TOULOUSE]);
+        }
         return;
     }
     
@@ -417,6 +425,11 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     LocationID destination = 0;
     int highScore = 0;
     LocationID location;
+    int distanceMultiplier = 10; //Default
+    if (numPaths > 60) {
+        // Too many paths, not enough reliable information
+        distanceMultiplier = 300;
+    }
     for (location = 0; location < NUM_MAP_LOCATIONS; location++) {
         int curScore = 0;
         // If we are next to the location being considered, high chance
@@ -428,7 +441,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         int k;
         for (k = 0; k < NUM_PLAYERS - 1; k++) {
             if (k != player) {
-                curScore += 10 * distance[k][location];
+                curScore += distanceMultiplier * distance[k][location];
             }
         }
         if (curScore > highScore) {
