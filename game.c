@@ -9,6 +9,8 @@
 #include <string.h>
 #include <assert.h>
 
+#define printf(...)
+
 typedef struct _node *Node;
 typedef struct _node {
     LocationID move;

@@ -7,6 +7,8 @@
 #include "HunterView.h"
 #include "locations.h"
 
+#define printf(...)
+
 /*
 static LocationID moveID(char a, char b) {
     char move[3];
