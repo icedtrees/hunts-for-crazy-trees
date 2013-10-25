@@ -313,6 +313,7 @@ int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], Location
 // Returns distance of path and array containing path by reference
 // Returns -1 if no path found
 int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationID **path) {
+    printf("trying to find shortest path...\n");
     int found = FALSE;
     int i;
 
@@ -327,6 +328,7 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
 
     Queue q = QueueCreate();
     QueuePush(q, source, source, startRound);
+    printf("made queue\n");
     while (!QueueEmpty(q)) {
         queueData data = QueuePop(q);
         if (seen[data.location]) {
@@ -350,7 +352,7 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
         free(adjLocs);
     }
     QueueDispose(q);
-    
+    printf("disposed queue\n");
     if (found) {
         int temp = rPush(source, dest, backtrace, path, 1);
         return temp;
@@ -539,8 +541,11 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         int k;
         int bestScore = 0;
         for (k = 0; k < numAdjLocs; k++) {
+            printf("iterating through adjLoc %d(%s)\n", k, names[k]);
+            printf("destination is %d(%s)\n", destination, names[destination]);
             LocationID *pathToTake = NULL;
             int distanceScore = shortestPath(hView, adjLocs[k], destination, &pathToTake);
+            printf("found shortest path!\n");
             assert(distanceScore != -1);
             free(pathToTake);
             int spreadScore = 0;
