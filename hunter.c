@@ -156,7 +156,10 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     } else {
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
+            //printf("TOTAL OF %d, currently %d\n", numPrevious, pathIndex);
+            //printf("Trying to access previousPaths[%d][%d]\n", pathIndex, lengthTrail - 1);
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
+            //printf("LAST CITY IS %d(%s)\n", lastCity, names[lastCity]);
             int newIndex;
             // add all possible land moves
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
@@ -537,6 +540,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             LocationID *pathToTake = NULL;
             int distanceScore = shortestPath(hView, adjLocs[k], destination, &pathToTake);
             assert(distanceScore != -1);
+            free(pathToTake);
             int spreadScore = 0;
             int h;
             for (h = 0; h < NUM_PLAYERS - 1; h++) {

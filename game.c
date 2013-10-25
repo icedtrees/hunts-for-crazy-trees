@@ -139,7 +139,7 @@ int main(int argc, char **argv) {
     // While the game isn't over yet
     while (g->hView->curScore > 0 && g->hView->players[PLAYER_DRACULA]->health > 0) {
         printf("GAME: A new turn! enter to continue..\n");
-        getchar();
+        //getchar();
         if (getCurrentPlayer(g->hView) < PLAYER_DRACULA) {
             // Current player is a hunter
             decideMove(g->hView);
@@ -150,6 +150,7 @@ int main(int argc, char **argv) {
             decideMoveDracula(g);
             confirmBestPlay();
         }
+        printf("Score: %d, Dracula's health: %d\n", g->hView->curScore, g->hView->players[PLAYER_DRACULA]->health);
         printf("%s\n", g->pastPlays);
     }
     
@@ -251,7 +252,13 @@ static void generatePastPlays(void) {
                     strcat(g->pastPlays, "S?");
                 }
             }
-            strcat(g->pastPlays, ".... ");
+            int encounters = curMove[i]->encounters;
+            if (encounters >= 100) {
+                strcat(g->pastPlays, "D... ");
+                encounters -= 100;
+            } else {
+                strcat(g->pastPlays, ".... ");
+            }
             
             curMove[i] = curMove[i]->next;
         }
@@ -324,8 +331,10 @@ void updateGame(char *play) {
             player->health -= 2;
             player->moves->last->encounters += 1;
         }
+        printf("Dracula is at %s\n", names[g->players[PLAYER_DRACULA]->curLoc]);
         if (g->players[PLAYER_DRACULA]->curLoc == playID) {
             // found dracula
+            printf("HUNTER HITS DRACULA REALLY HARD\n");
             if (player->health > 0) {
                 g->players[PLAYER_DRACULA]->health -= 10;
             }
