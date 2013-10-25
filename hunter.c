@@ -28,7 +28,12 @@ int intPow(int base, int index);
 static int inArray(LocationID *array, LocationID location, int length);
 
 void decideMove(HunterView hView) {
-    printf("Player %d: Deciding move\n", getCurrentPlayer(hView));
+    PlayerID currentPlayer = getCurrentPlayer(hView);
+    printf("Player %d: Deciding move\n", currentPlayer);
+    if (currentPlayer < 0 || currentPlayer >= NUM_PLAYERS - 1) {
+        fprintf(stderr, "Calling decideMove on an invalid player %d\n", currentPlayer);
+        exit(1);
+    }
     // backup "default" move for the start
     char bestMove[3] = "JM"; // Start at hospital
     LocationID curLocation = getLocation(hView, getCurrentPlayer(hView));
