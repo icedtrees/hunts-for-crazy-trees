@@ -1,0 +1,1 @@
+void decideMoveDracula (GameView g);

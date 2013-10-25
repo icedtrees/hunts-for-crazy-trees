@@ -468,15 +468,17 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     int highScore = 0;
     LocationID location;
     int distanceMultiplier = 10; //Default
-    if (numPaths > 60) {
-        // Too many paths, not enough reliable information
-        distanceMultiplier = 300;
-    }
+    printf("%d possible paths\n", numPaths);
+    // goDirect is a flag to specifies whether to go directly to a point
+    // (usually adjacent square) or to take the path which spreads out the most.
+    int goDirect = FALSE;
     for (location = 0; location < NUM_MAP_LOCATIONS; location++) {
         int curScore = 0;
+        int urgentCheck = FALSE; //printf only
         // If we are next to the location being considered, high chance
         // that we want to investigate it if there's a chance he's right there
         if (inArray(adjLocs, location, numAdjLocs)) {
+            urgentCheck = TRUE;
             curScore += 500 * probableNow[location];
         }
         curScore += 100 * probableNext[location];
@@ -487,34 +489,73 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             }
         }
         if (curScore > highScore) {
+            if (urgentCheck == TRUE) {
+                goDirect = TRUE;
+                printf("Location %s is a good place to URGENTLY check out\n", names[location]);
+            } else {
+                goDirect = FALSE;
+                printf("Location %s is a good place to check out\n", names[location]);
+            }
             highScore = curScore;
             destination = location;
         }
     }
-    free(adjLocs);
-
-    // Get the first step of the optimal path towards our destination
+    printf("I really think the best place to go is %s\n", names[destination]);
+    
     LocationID firstStep = playerLoc; // Default move
-    if (playerLoc != destination) {
-        LocationID *pathToTake = NULL;
-        int length = shortestPath(hView, playerLoc, destination, &pathToTake);
+    if (goDirect) {
+        printf("Go direct! Get 'em boys!\n");
+        // Get the first step of the optimal path towards our destination
+        if (playerLoc != destination) {
+            LocationID *pathToTake = NULL;
+            int length = shortestPath(hView, playerLoc, destination, &pathToTake);
 
-        assert(length > 1);
-        if (pathToTake != NULL) {
-            firstStep = pathToTake[1];
-            free(pathToTake);
+            assert(length > 1);
+            if (pathToTake != NULL) {
+                firstStep = pathToTake[1];
+                free(pathToTake);
+            }
+        
+            /*printf("Best place to go is %s\n", names[destination]);
+            printf("Path is: ");
+            int i;
+            for (i = 0; i < length; i++) {
+                printf("i is %d\n", i);
+                printf("pathToTake[i] is %d\n", pathToTake[i]);
+                printf("%s ", names[pathToTake[i]]);
+            }
+            printf("\n");*/
         }
-    
-        /*printf("Best place to go is %s\n", names[destination]);
-        printf("Path is: ");
-        int i;
-        for (i = 0; i < length; i++) {
-            printf("i is %d\n", i);
-            printf("pathToTake[i] is %d\n", pathToTake[i]);
-            printf("%s ", names[pathToTake[i]]);
+        printf("Thus the first step to take is %s\n", names[firstStep]);
+    } else {
+        printf("Spreading out\n");
+        // Consider all first steps
+        // Score it based on shortest distance and greatest spread
+        int k;
+        int bestScore = 0;
+        for (k = 0; k < numAdjLocs; k++) {
+            LocationID *pathToTake = NULL;
+            int distanceScore = shortestPath(hView, adjLocs[k], destination, &pathToTake);
+            assert(distanceScore != -1);
+            int spreadScore = 0;
+            int h;
+            for (h = 0; h < NUM_PLAYERS - 1; h++) {
+                if (h != player) {
+                    spreadScore += distance[h][adjLocs[k]];
+                }
+            }
+            
+            int totalScore = 200 + (5 * spreadScore) - (10 * distanceScore);
+            printf("City: %s, Dist: %d, Spread: %d, Total: %d\n", names[adjLocs[k]], distanceScore, spreadScore, totalScore);
+            if (totalScore > bestScore) {
+                printf("Best score, go for it\n");
+                bestScore = totalScore;
+                firstStep = adjLocs[k];
+            }
         }
-        printf("\n");*/
+        printf("First step to tak is %s\n", names[firstStep]);
     }
-    
+            
+    free(adjLocs);
     strcpy(bestMove, names[firstStep]);
 }
