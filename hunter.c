@@ -14,6 +14,11 @@
 
 #define MAX_MESSAGE_SIZE 128
 
+#ifdef DEBUG
+#  define D(x) x
+#else
+#  define D(x) 
+#endif
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
@@ -157,7 +162,10 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     } else {
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
+            //printf("%d\n", pathIndex);
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
+            //printf("SEGFAULTS???\n");
+            fflush(stdout);
             int newIndex;
             // add all possible land moves
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {

@@ -17,7 +17,7 @@ game: $(HUNTER_DEPENDENCIES) game.c dracula.c
 	$(CC) $(CFLAGS) -o game $(HUNTER_FILES) game.c dracula.c
 
 # Tests for the hunter.c
-hunterTests: testHunter0 testHunter1 testHunter2 testHunter3 testHunter4 testHunter5
+hunterTests: testHunter0 testHunter1 testHunter2 testHunter3 testHunter4 testHunter5 testHunter6
 
 testHunter0: $(HUNTER_DEPENDENCIES) testHunter0.c
 	$(CC) $(CFLAGS) -o testHunter0 $(HUNTER_FILES) testHunter0.c
