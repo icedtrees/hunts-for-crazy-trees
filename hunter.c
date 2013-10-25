@@ -87,6 +87,8 @@ void decideMove(HunterView hView) {
         // Finally, register best move and message
         registerBestPlay(bestMove, message);
     }
+    free(draculaTrails); // trailing trail
+    // haha get it, TRAILing trail
 }
 
 // Determines whether Dracula's trail history contains enough information
