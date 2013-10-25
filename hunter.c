@@ -257,6 +257,8 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
             return FALSE;
         } else if (histories[PLAYER_DRACULA][i] == SEA_UNKNOWN && (trail[i] < NORTH_SEA || trail[i] > BLACK_SEA)) {
             return FALSE;
+        } else if (trail[i] == ST_JOSEPH_AND_ST_MARYS) { // dracula is banned from church since he is atheist
+            return FALSE;
         }
 
         // check that the trail matches the locations of the hunters]
