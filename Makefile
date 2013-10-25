@@ -31,11 +31,14 @@ testHunter2: $(HUNTER_DEPENDENCIES) testHunter2.c
 testHunter3: $(HUNTER_DEPENDENCIES) testHunter3.c
 	$(CC) $(CFLAGS) -o testHunter3 $(HUNTER_FILES) testHunter3.c
 
-testHunter4: $(HUNTER_DEPENDENCIES) testHunter3.c
+testHunter4: $(HUNTER_DEPENDENCIES) testHunter4.c
 	$(CC) $(CFLAGS) -o testHunter4 $(HUNTER_FILES) testHunter4.c
     
-testHunter5: $(HUNTER_DEPENDENCIES) testHunter3.c
+testHunter5: $(HUNTER_DEPENDENCIES) testHunter5.c
 	$(CC) $(CFLAGS) -o testHunter5 $(HUNTER_FILES) testHunter5.c
+    
+testHunter6: $(HUNTER_DEPENDENCIES) testHunter6.c
+	$(CC) $(CFLAGS) -o testHunter6 $(HUNTER_FILES) testHunter6.c
 
 # Tests for the HunterView.c
 hunterViewTests: testHunterView testHunterView1 testHunterView2 testHunterView3 testHunterView4
