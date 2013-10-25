@@ -28,10 +28,10 @@ int intPow(int base, int index);
 static int inArray(LocationID *array, LocationID location, int length);
 
 void decideMove(HunterView hView) {
-    PlayerID currentPlayer = getCurrentPlayer(hView);
-    printf("Player %d: Deciding move\n", currentPlayer);
-    if (currentPlayer < 0 || currentPlayer >= NUM_PLAYERS - 1) {
-        fprintf(stderr, "Calling decideMove on an invalid player %d\n", currentPlayer);
+    PlayerID currentHunter = getCurrentPlayer(hView);
+    printf("Player %d: Deciding move\n", currentHunter);
+    if (currentHunter < 0 || currentHunter > NUM_PLAYERS - 1) {
+        fprintf(stderr, "Calling decideMove on an invalid player %d\n", currentHunter);
         exit(1);
     }
     // backup "default" move for the start
