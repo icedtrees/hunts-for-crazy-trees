@@ -70,14 +70,9 @@ void decideMove(HunterView hView) {
     } else {
         maxDepth = 6;
     }
-    printf("depth = 0: draculaTrails is %p, numPaths is %d\n", draculaTrails, numPaths);
     for (depth = 1; depth < maxDepth; depth ++) {
-        printf("start of loop, depth = %d, draculaTrails is %p, numPaths is %d\n", depth, draculaTrails, numPaths);
-        printf("previousTrails = %p, previousNumPaths = %d\n", previousTrails, previousNumPaths);
-        printf("assigning previousTrails and previousNumPaths...\n");
         previousTrails = draculaTrails;
         previousNumPaths = numPaths;
-        printf("previousTrails is now %p, previousNumPaths is now %d\n", previousTrails, previousNumPaths);
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
         // Use all possible dracula trails to evaluate a best move
@@ -91,6 +86,10 @@ void decideMove(HunterView hView) {
         free(previousTrails);
         // Finally, register best move and message
         registerBestPlay(bestMove, message);
+    }
+    int i;
+    for (i = 0; i < numPaths; i ++) {
+        free(draculaTrails[i]);
     }
     free(draculaTrails); // trailing trail
     // haha get it, TRAILing trail
@@ -165,13 +164,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
             fflush(stdout);
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
-            if (lastCity > NUM_LOCATIONS) {
-                printf("pathIndex is %d, numPrevious is %d, lengthTrail - 1 is %d, lastCity is %d\n", pathIndex, numPrevious, lengthTrail - 1, lastCity);
-                printf("go up one: %d\n", previousPaths[pathIndex - 1][lengthTrail - 1]);
-                printf("go down one: %d\n", previousPaths[pathIndex + 1][lengthTrail - 1]);
-                printf("go left one: %d\n", previousPaths[pathIndex][lengthTrail - 2]);
-                printf("go left two: %d\n", previousPaths[pathIndex][lengthTrail - 3]);
-            }
             fflush(stdout);
             int newIndex = 0;
             // add all possible land moves
@@ -182,19 +174,14 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 if (adjacencyRoad[lastCity][newIndex] > NUM_MAP_LOCATIONS || adjacencyRoad[lastCity][newIndex] < 0) {
-                    printf("Addresses: lastCity: %p, newIndex: %p\n", &lastCity, &newIndex);
-                    printf("END is #define'd as %d\n", END);
-                    printf("Attempting to add %d(adjacencyRoad[%d][%d]) as next city in a path\n", lastCity, newIndex, adjacencyRoad[lastCity][newIndex]);
                     getchar();
                 }
                 assert(lengthTrail < 6);
                 newPath[lengthTrail] = adjacencyRoad[lastCity][newIndex];
 
                 if (validDraculaTrail(histories, newPath)) {
-                    printf("pathIndex is %d, numPrevious is %d, lengthTrail - 1 is %d, lastCity is %d\n", pathIndex, numPrevious, lengthTrail - 1, lastCity);
                     int k;
                     for (k = 0; k < TRAIL_SIZE; k++) {
-                        printf("newPath[%d]: %d | previousPaths[%d][%d]: %d\n", k, newPath[k], pathIndex, k, previousPaths[pathIndex][k]);
                         assert(newPath[k] < NUM_LOCATIONS);
                     }
                     generatedTrails[*numPaths] = newPath;

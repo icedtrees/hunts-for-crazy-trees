@@ -5,7 +5,7 @@
 #ifndef LOCATIONS_H
 #define LOCATIONS_H
 
-#define END -23
+#define END -2
 #define MAX_CONNECTIONS 20
 
 // Adjacent locations by sea or land
