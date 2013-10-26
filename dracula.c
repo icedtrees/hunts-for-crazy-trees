@@ -1,4 +1,3 @@
-#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -64,7 +63,6 @@ int inArray(LocationID *array, LocationID location, int length) {
 }
 
 void decideMoveDracula (GameView g) {
-    srand(time(NULL));
     printf("Dracula: YAY it's my turn!\n");
     LocationID curLocation = gameGetLocation(g, PLAYER_DRACULA);
     printf("Dracula: I am at %d(%s)\n", curLocation, names[curLocation]);
