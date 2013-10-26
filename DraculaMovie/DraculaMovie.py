@@ -36,15 +36,16 @@ class Player(object):
     def display(self):
         pygame.draw.circle(screen, self.colour, self.get_position(), self.size, self.thickness)
 
-inputSource = "game1.txt"
-#inputSource = "stdin"
+inputSource = raw_input("What input would you like to use?")
+
+# Get move delay
+moveDelay = input("What move delay would you like? (ms)")
 
 # Get rectangle background from Europe map
 europeMap = pygame.image.load("Europe.png")
 backgroundRect = europeMap.get_rect()
 
-# Get move delay
-moveDelay = input("What move delay would you like? (ms)")
+
 
 # Get plays input from source
 pastPlays = [] # Format: (player, city), (player, city), etc.
