@@ -92,6 +92,10 @@ void decideMove(HunterView hView) {
         // Finally, register best move and message
         registerBestPlay(bestMove, message);
     }
+    int i;
+    for (i = 0; i < numPaths; i ++) {
+        free(draculaTrails[i]);
+    }
     free(draculaTrails); // trailing trail
     // haha get it, TRAILing trail
 }
