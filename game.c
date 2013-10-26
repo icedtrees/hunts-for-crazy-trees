@@ -133,6 +133,7 @@ GameView newGameView() {
 }
 
 void confirmBestPlay();
+void disposeGameView(void);
 
 int main(int argc, char **argv) {
     srand(time(NULL));
@@ -166,20 +167,27 @@ int main(int argc, char **argv) {
     }
     
     
-    /*
-    registerBestPlay("BE", "");
-    registerBestPlay("ZU", "");
-    registerBestPlay("AL", "");
-    registerBestPlay("BS", "");
-    registerBestPlay("CD", "");
-    
-    registerBestPlay("SJ", "");
-    registerBestPlay("ST", "");
-    registerBestPlay("SR", "");
-    registerBestPlay("CD", "");
-    */
+    disposeGameView();
     
     return EXIT_SUCCESS;
+}
+
+void disposeGameView(void) {
+    int i;
+    Node previousMove = NULL;
+    Node currentMove = NULL;
+    for (i = 0; i < NUM_PLAYERS; i ++) {
+        currentMove = g->players[i]->moves->first;
+        while (currentMove != NULL) {
+            previousMove = currentMove;
+            currentMove = currentMove->next;
+            free(previousMove);
+        }
+        free(g->players[i]->moves);
+        free(g->players[i]);
+    }
+    disposeHunterView(g->hView);
+    free(g);
 }
 
 static LocationID moveID(char a, char b) {
