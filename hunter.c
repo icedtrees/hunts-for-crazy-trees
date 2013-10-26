@@ -74,9 +74,14 @@ void decideMove(HunterView hView) {
     } else {
         maxDepth = 6;
     }
+    printf("depth = 0: draculaTrails is %p, numPaths is %d\n", draculaTrails, numPaths);
     for (depth = 1; depth < maxDepth; depth ++) {
+        printf("start of loop, depth = %d, draculaTrails is %p, numPaths is %d\n", depth, draculaTrails, numPaths);
+        printf("previousTrails = %p, previousNumPaths = %d\n", previousTrails, previousNumPaths);
+        printf("assigning previousTrails and previousNumPaths...\n");
         previousTrails = draculaTrails;
         previousNumPaths = numPaths;
+        printf("previousTrails is now %p, previousNumPaths is now %d\n", previousTrails, previousNumPaths);
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
         // Use all possible dracula trails to evaluate a best move
@@ -162,13 +167,22 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     } else {
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
-            //printf("%d\n", pathIndex);
-            LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
-            //printf("SEGFAULTS???\n");
             fflush(stdout);
-            int newIndex;
+            LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
+            if (lastCity > NUM_LOCATIONS) {
+                printf("pathIndex is %d, numPrevious is %d, lengthTrail - 1 is %d, lastCity is %d\n", pathIndex, numPrevious, lengthTrail - 1, lastCity);
+                printf("go up one: %d\n", previousPaths[pathIndex - 1][lengthTrail - 1]);
+                printf("go down one: %d\n", previousPaths[pathIndex + 1][lengthTrail - 1]);
+                printf("go left one: %d\n", previousPaths[pathIndex][lengthTrail - 2]);
+                printf("go left two: %d\n", previousPaths[pathIndex][lengthTrail - 3]);
+            }
+            fflush(stdout);
+            int newIndex = 0;
             // add all possible land moves
+            fflush(stdout);
+            fflush(stdout);
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
+                fflush(stdout);
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = adjacencyRoad[lastCity][newIndex];
@@ -181,19 +195,23 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 }
             }
             // add all possible sea moves
+            fflush(stdout);
             for (newIndex = 0; adjacencySea[lastCity][newIndex] != END; newIndex ++) {
+                fflush(stdout);
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = adjacencyRoad[lastCity][newIndex];
-                
                 if (validDraculaTrail(histories, newPath)) {
                     generatedTrails[*numPaths] = newPath;
                     *numPaths = *numPaths + 1;
                 } else {
                     free(newPath);
                 }
+                fflush(stdout);
             }
+            fflush(stdout);
             // special move: teleport
+            /*
             if (histories[PLAYER_DRACULA][lengthTrail] == TELEPORT) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
@@ -201,9 +219,11 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 generatedTrails[*numPaths] = newPath;
                 *numPaths = *numPaths + 1;
             }
+            */
             
         }
     }
+    fflush(stdout);
 
     return generatedTrails;
 }
