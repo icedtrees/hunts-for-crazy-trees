@@ -9,7 +9,7 @@
 #include <string.h>
 #include <assert.h>
 
-//#define printf(...)
+#define printf(...)
 
 typedef struct _node *Node;
 typedef struct _node {
@@ -136,7 +136,13 @@ void confirmBestPlay();
 void disposeGameView(void);
 
 int main(int argc, char **argv) {
-    srand(time(NULL));
+    if (argc > 1) {
+        int seed;
+        sscanf(argv[1], "%d", &seed);
+        srand(seed);
+    } else {
+        srand(time(NULL));
+    }
     // Create a new empty GameView
     g = newGameView();
     
@@ -166,9 +172,10 @@ int main(int argc, char **argv) {
         printf("I don't know what happened but good game everyone\n");
     }
     
-    
+    int finalScore = g->hView->curScore;
     disposeGameView();
     
+    fprintf(stderr, "%d\n", finalScore);
     return EXIT_SUCCESS;
 }
 
