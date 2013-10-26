@@ -133,7 +133,7 @@ int main(int argc, char * argv[]) {
     assert(getHealth(v, PLAYER_MINA_HARKER) == GAME_START_HUNTER_LIFE_POINTS);
     assert(getHealth(v, PLAYER_DRACULA) == GAME_START_BLOOD_POINTS - 20 - 4);
     assert(getRound(v) == 6);
-    assert(getScore(v) == GAME_START_SCORE - 6 - 26);
+    assert(getScore(v) == GAME_START_SCORE - 6 - 26 - 6);
     printf("Passed!\n");
     
     printf("Test case focusing on dracula teleport and histories...");
@@ -157,7 +157,7 @@ int main(int argc, char * argv[]) {
     assert(getHealth(v, PLAYER_MINA_HARKER) == GAME_START_HUNTER_LIFE_POINTS);
     assert(getHealth(v, PLAYER_DRACULA) == GAME_START_BLOOD_POINTS - 10 - 4);
     assert(getRound(v) == 8);
-    assert(getScore(v) == GAME_START_SCORE - 8 - 26);
+    assert(getScore(v) == GAME_START_SCORE - 8 - 26 - 6);
     LocationID historyG2[] = {SARAJEVO, SARAJEVO, SARAJEVO, SARAJEVO, SARAJEVO, SARAJEVO};
     LocationID historyS2[] = {BERLIN, BERLIN, BERLIN, BERLIN, BERLIN, BERLIN};
     LocationID historyH2[] = {SARAJEVO, SARAJEVO, SARAJEVO, CAGLIARI, CAGLIARI, CAGLIARI};
@@ -197,7 +197,7 @@ int main(int argc, char * argv[]) {
     assert(getHealth(v, PLAYER_MINA_HARKER) == GAME_START_HUNTER_LIFE_POINTS);
     assert(getHealth(v, PLAYER_DRACULA) == GAME_START_BLOOD_POINTS - 10 - 6);
     assert(getRound(v) == 9);
-    assert(getScore(v) == GAME_START_SCORE - 9 - 26);
+    assert(getScore(v) == GAME_START_SCORE - 9 - 26 - 6);
     printf("Passed!\n");
 
     printf("All passed! Disposing...\n");
