@@ -9,6 +9,8 @@
 # Licence:     GNU GPL 3.0
 #-------------------------------------------------------------------------------
 
+#!/usr/bin/python2.7
+
 import sys
 import pygame
 
@@ -40,6 +42,9 @@ inputSource = "game1.txt"
 # Get rectangle background from Europe map
 europeMap = pygame.image.load("Europe.png")
 backgroundRect = europeMap.get_rect()
+
+# Get move delay
+moveDelay = input("What move delay would you like? (ms)")
 
 # Get plays input from source
 pastPlays = [] # Format: (player, city), (player, city), etc.
@@ -73,13 +78,21 @@ while True:
     screen.blit(europeMap, backgroundRect)
 
     # draw players
-    if (framesPassed // 100 < len(pastPlays)): # 4 seconds
+    if framesPassed * 10 // moveDelay < len(pastPlays):
         # draw the next five plays
-        startIndex = framesPassed // 100
-        for play in pastPlays[startIndex:startIndex + 5]:
-            currentPlayer = players[play[0]]
-            currentPlayer.currentCity = play[1]
-            currentPlayer.display()
+        startIndex = framesPassed * 10 // moveDelay
+        currentPlayer = players[pastPlays[startIndex][0]]
+        currentMove = pastPlays[startIndex][1]
+        if currentMove == "HI":
+            pass # no change
+        elif (currentMove[0] == "D"):
+            pass # yolo
+        else:
+            currentPlayer.currentCity = currentMove
+
+    for player in players.values():
+        if player.currentCity != "C?":
+            player.display()
 
     pygame.display.flip()
     pygame.time.delay(10)
