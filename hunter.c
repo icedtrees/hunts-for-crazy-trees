@@ -14,7 +14,7 @@
 
 #define MAX_MESSAGE_SIZE 128
 
-//#define printf(...)
+#define printf(...)
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
@@ -180,8 +180,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
                 fflush(stdout);
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
-                printf("REQUIRED RESULT OF MEMCPY: %p (copied from %p)\n", newPath, previousPaths[pathIndex]);
-                printf("RESULT OF MEMCPY: %p\n", memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID)));
+                memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 if (adjacencyRoad[lastCity][newIndex] > NUM_MAP_LOCATIONS || adjacencyRoad[lastCity][newIndex] < 0) {
                     printf("Addresses: lastCity: %p, newIndex: %p\n", &lastCity, &newIndex);
                     printf("END is #define'd as %d\n", END);
@@ -195,7 +194,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                     printf("pathIndex is %d, numPrevious is %d, lengthTrail - 1 is %d, lastCity is %d\n", pathIndex, numPrevious, lengthTrail - 1, lastCity);
                     int k;
                     for (k = 0; k < TRAIL_SIZE; k++) {
-                        printf("newPath[%d]: %d\n", k, newPath[k]);
+                        printf("newPath[%d]: %d | previousPaths[%d][%d]: %d\n", k, newPath[k], pathIndex, k, previousPaths[pathIndex][k]);
                         assert(newPath[k] < NUM_LOCATIONS);
                     }
                     generatedTrails[*numPaths] = newPath;
@@ -203,9 +202,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 } else {
                     free(newPath);
                 }
-                printf("%d\n", adjacencyRoad[lastCity][newIndex]);
             }
-            printf("LOOP FINALLY ENDED with adjacencyRoad[%d][%d] = %d\n", lastCity, newIndex, adjacencyRoad[lastCity][newIndex]);
             // add all possible sea moves
             fflush(stdout);
             for (newIndex = 0; adjacencySea[lastCity][newIndex] != END; newIndex ++) {

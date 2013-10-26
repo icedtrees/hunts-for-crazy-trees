@@ -68,8 +68,8 @@ void decideMoveDracula (GameView g) {
     printf("Dracula: I am at %d(%s)\n", curLocation, names[curLocation]);
     if (curLocation == UNKNOWN_LOCATION) {
         //printf("Dracula: I am lost =[ I go home to Castle Dracula\n");
-        printf("Dracula: I am lost =[ I go to Le Havre\n");
-        curLocation = LE_HAVRE;
+        printf("Dracula: I am lost =[ I go to Madrid\n");
+        curLocation = MADRID;
     }
     int numAdjLocs;
     LocationID *adjLocs = connectedLocations(gameGetHunterView(g), &numAdjLocs, curLocation, PLAYER_DRACULA,
