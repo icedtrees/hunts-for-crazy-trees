@@ -14,11 +14,7 @@
 
 #define MAX_MESSAGE_SIZE 128
 
-#ifdef DEBUG
-#  define D(x) x
-#else
-#  define D(x) 
-#endif
+#define printf(...)
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
@@ -477,27 +473,36 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     LocationID destination = 0;
     int highScore = 0;
     LocationID location;
-    int distanceMultiplier = 10; //Default
+    // Distance multiplier should be really very minor
+    // as it is only meant to break ties
+    int distanceMultiplier = 10 * numPaths;
     // printf("%d possible paths\n", numPaths);
     // goDirect is a flag to specifies whether to go directly to a point
     // (usually adjacent square) or to take the path which spreads out the most.
     int goDirect = FALSE;
     for (location = 0; location < NUM_MAP_LOCATIONS; location++) {
+        // How far are we from this location being considered?
+        // The closer we are the more relevant it is
+        LocationID *path = NULL;
+        int distanceToLoc = 20 - shortestPath(hView, playerLoc, location, &path);
+        free(path);
         int curScore = 0;
-        int urgentCheck = FALSE; //printf only
+        int urgentCheck = FALSE;
         // If we are next to the location being considered, high chance
         // that we want to investigate it if there's a chance he's right there
         if (inArray(adjLocs, location, numAdjLocs)) {
             urgentCheck = TRUE;
-            curScore += 500 * probableNow[location];
+            curScore += 500 * probableNow[location] * numPaths;
         }
-        curScore += 100 * probableNext[location];
+        curScore += 100 * probableNext[location] * numPaths;
         int k;
         for (k = 0; k < NUM_PLAYERS - 1; k++) {
             if (k != player) {
                 curScore += distanceMultiplier * distance[k][location];
             }
         }
+        curScore *= distanceToLoc;
+        curScore /= 20;
         if (curScore > highScore) {
             if (urgentCheck == TRUE) {
                 goDirect = TRUE;

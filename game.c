@@ -135,6 +135,7 @@ GameView newGameView() {
 void confirmBestPlay();
 
 int main(int argc, char **argv) {
+    srand(time(NULL));
     // Create a new empty GameView
     g = newGameView();
     
