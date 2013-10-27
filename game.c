@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
     while (g->hView->curScore > 0 && g->hView->players[PLAYER_DRACULA]->health > 0) {
         printf("GAME: A new turn! enter to continue..\n");
         fflush(stdout);
-        getchar();
+        //getchar();
         if (getCurrentPlayer(g->hView) < PLAYER_DRACULA) {
             // Current player is a hunter
             decideMove(g->hView);
@@ -415,6 +415,21 @@ void updateGame(char *play) {
         // did he rest
         if (playID == player->curLoc) {
             player->health += 3;
+        }
+
+        if (g->curPlayer == PLAYER_DRACULA - 1 && g->curRound > 6) {
+            // reveal dracula if hunters research
+            int numHuntersResearched = 0;
+            int j;
+            for (j = 0; j < PLAYER_DRACULA; j++) {
+                if (g->players[j]->curLoc == g->players[j]->moves->last->prev->move) {
+                    numHuntersResearched++;
+                }
+            }
+            if (numHuntersResearched == 4) {
+                printf("HUNTERS RESEARCHED, REVEAL DRACULA\n");
+                revealDracula(6);
+            }
         }
     } else {
         //dracula
