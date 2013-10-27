@@ -55,7 +55,7 @@ moveDelay = input("What move delay would you like? (ms)")
 
 
 # Basic display settings
-screen = pygame.display.set_mode((996, 704))
+screen = pygame.display.set_mode((1405, 993))
 pygame.display.set_caption("Dracula: THE MOVIE")
 
 # Get rectangle background from Europe map
