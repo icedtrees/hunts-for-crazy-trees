@@ -51,6 +51,7 @@ struct gameView {
     // +1 per trap and +10 for a vampire
     int obstacles[NUM_MAP_LOCATIONS];
     char pastPlays[100000];
+    char revealedPastPlays[100000];
     int vampireCountdown;
     HunterView hView;
 };
@@ -173,9 +174,10 @@ int main(int argc, char **argv) {
     }
     
     int finalScore = g->hView->curScore;
+    fprintf(stderr, "%s\n", g->revealedPastPlays);
     disposeGameView();
     
-    fprintf(stderr, "%d\n", finalScore);
+    fprintf(stdout, "%d\n", finalScore);
     return EXIT_SUCCESS;
 }
 
@@ -276,6 +278,48 @@ static void generatePastPlays(void) {
                 encounters -= 100;
             } else {
                 strcat(g->pastPlays, ".... ");
+            }
+            
+            curMove[i] = curMove[i]->next;
+        }
+    }
+}
+
+static void generateRevealedPastPlays(void) {
+    g->revealedPastPlays[0] = 0;
+    Round round;
+    Node curMove[NUM_PLAYERS];
+    int i;
+    for (i = 0; i < NUM_PLAYERS; i++) {
+        curMove[i] = g->players[i]->moves->first;
+    }
+    for (round = 0; round <= g->curRound; round++) {
+        for (i = 0; i < NUM_PLAYERS; i++) {
+            if (curMove[i] == NULL) {
+                // remove trailing space
+                g->revealedPastPlays[strlen(g->revealedPastPlays) - 1] = 0;
+                return;
+            }
+            if (i == PLAYER_LORD_GODALMING) {
+                strcat(g->revealedPastPlays, "G");
+            } else if (i == PLAYER_DR_SEWARD) {
+                strcat(g->revealedPastPlays, "S");
+            } else if (i == PLAYER_VAN_HELSING) {
+                strcat(g->revealedPastPlays, "H");
+            } else if (i == PLAYER_MINA_HARKER) {
+                strcat(g->revealedPastPlays, "M");
+            } else if (i == PLAYER_DRACULA) {
+                strcat(g->revealedPastPlays, "D");
+            }
+            
+            strcat(g->revealedPastPlays, names[curMove[i]->move]);
+
+            int encounters = curMove[i]->encounters;
+            if (encounters >= 100) {
+                strcat(g->revealedPastPlays, "D... ");
+                encounters -= 100;
+            } else {
+                strcat(g->revealedPastPlays, ".... ");
             }
             
             curMove[i] = curMove[i]->next;
@@ -434,6 +478,7 @@ void updateGame(char *play) {
     }
     
     generatePastPlays();
+    generateRevealedPastPlays();
 }
 
 void confirmBestPlay() {
