@@ -86,16 +86,20 @@ for player in (godalming, seward, helsing, mina, dracula):
 
 locationIndex = 0
 framesPassed = 0
+startIndex = 0
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             pygame.quit()
             exit(0)
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            startIndex += 1
 
     # move current player
-    if framesPassed * 10 // moveDelay < len(pastPlays):
+    # if framesPassed * 10 // moveDelay < len(pastPlays):
+    if True:
         # draw the next five plays
-        startIndex = framesPassed * 10 // moveDelay
+        # startIndex = framesPassed * 10 // moveDelay
         currentPlayer = players[pastPlays[startIndex][0]]
         currentMove = pastPlays[startIndex][1]
         if currentMove == "HI":
