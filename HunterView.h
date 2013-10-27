@@ -19,7 +19,7 @@
 
 #define NUM_PLAYERS     5
 
-#define TRAIL_SIZE 6
+#define TRAIL_SIZE 12
 
 //Score
 #define GAME_START_SCORE                366

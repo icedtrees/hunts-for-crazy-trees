@@ -24,7 +24,6 @@ void generateMessage(HunterView hView, char *message);
 LocationID **getDraculaTrails(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail);
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths);
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail);
-int intPow(int base, int index);
 
 static int inArray(LocationID *array, LocationID location, int length);
 
@@ -65,10 +64,10 @@ void decideMove(HunterView hView) {
     
     int depth; // how deep to take the analysis
     int maxDepth;
-    if (getRound(hView) < 6) {
+    if (getRound(hView) < TRAIL_SIZE) {
         maxDepth = getRound(hView);
     } else {
-        maxDepth = 6;
+        maxDepth = TRAIL_SIZE;
     }
     for (depth = 1; depth < maxDepth; depth ++) {
         previousTrails = draculaTrails;
@@ -137,13 +136,13 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     
     
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
-    LocationID **generatedTrails = malloc(NUM_MAP_LOCATIONS * intPow(MAX_ADJACENT_LOCATIONS, lengthTrail) * sizeof(LocationID *));
     int numPrevious = *numPaths;
     *numPaths = 0;
-    
+    LocationID **generatedTrails;
     
     // Generate all the possible trails
     if (lengthTrail == 0) { // previous paths not relevant
+        generatedTrails = malloc(NUM_MAP_LOCATIONS * sizeof(LocationID *)); 
         LocationID currentLocation;
         for (currentLocation = 0; currentLocation < NUM_MAP_LOCATIONS; currentLocation ++) {
             LocationID *initialTrail = malloc(TRAIL_SIZE * sizeof(LocationID));
@@ -160,6 +159,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             }
         }
     } else {
+        generatedTrails = malloc(MAX_ADJACENT_LOCATIONS * numPrevious * sizeof(LocationID *));
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
@@ -173,7 +173,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                     printf("SOMETHING SERIOUSLY WRONG\n");
                     getchar();
                 }
-                assert(lengthTrail < 6);
+                assert(lengthTrail < TRAIL_SIZE);
                 newPath[lengthTrail] = adjacencyRoad[lastCity][newIndex];
 
                 if (validDraculaTrail(histories, newPath)) {
@@ -290,13 +290,6 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
     return TRUE;
 }
 
-
-int intPow(int base, int index) {
-    if (index == 0) {
-        return 1;
-    }
-    return base * intPow(base, index - 1);
-}
 
 static int inArray(LocationID *array, LocationID location, int length) {
     int i;
