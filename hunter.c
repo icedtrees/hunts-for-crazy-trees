@@ -162,15 +162,11 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     } else {
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
-            fflush(stdout);
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
-            fflush(stdout);
+
             int newIndex = 0;
             // add all possible land moves
-            fflush(stdout);
-            fflush(stdout);
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
-                fflush(stdout);
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 if (adjacencyRoad[lastCity][newIndex] > NUM_MAP_LOCATIONS || adjacencyRoad[lastCity][newIndex] < 0) {
@@ -191,9 +187,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 }
             }
             // add all possible sea moves
-            fflush(stdout);
             for (newIndex = 0; adjacencySea[lastCity][newIndex] != END; newIndex ++) {
-                fflush(stdout);
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = adjacencySea[lastCity][newIndex];
@@ -203,11 +197,8 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 } else {
                     free(newPath);
                 }
-                fflush(stdout);
             }
-            fflush(stdout);
             // special move: teleport
-            /*
             if (histories[PLAYER_DRACULA][lengthTrail] == TELEPORT) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
@@ -215,11 +206,9 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 generatedTrails[*numPaths] = newPath;
                 *numPaths = *numPaths + 1;
             }
-            */
             
         }
     }
-    fflush(stdout);
 
     return generatedTrails;
 }
