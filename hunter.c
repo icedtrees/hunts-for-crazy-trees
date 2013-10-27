@@ -421,13 +421,13 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             numUnknown++;
         }
     }
-    if (numUnknown >= 8) {
+    if (numUnknown == 8) {
         printf("8 unknown, rest and research\n");
         // So little information, rest and research
         strcpy(bestMove, names[playerLoc]);
         return;
     }
-    if (trailSize >= 6 && numUnknown >= 6) {
+    if (trailSize <= 6 && numUnknown >= 6) {
         printf("%d unknown at start, rest and research\n", numUnknown);
         // no info, rest and research
         strcpy(bestMove, names[playerLoc]);
