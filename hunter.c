@@ -95,27 +95,38 @@ void decideMove(HunterView hView) {
     // haha get it, TRAILing trail
 }
 
+double min(double a, double b) {
+    if (a < b) {
+        return a;
+    }
+    return b;
+}
+
+double max(double a, double b) {
+    if (a > b) {
+        return a;
+    }
+    return b;
+}
+
 // Determines whether Dracula's trail history contains enough information
 // To make it worth analysing
-int enoughInformation(LocationID trail[TRAIL_SIZE]) {
+double amountInformation(LocationID trail[TRAIL_SIZE]) {
     // TODO improve this function
-    int amountInfo = 0;
+    double amountInfo = 0;
     int i;
     for (i = 0; i < TRAIL_SIZE; i++) {
-        if (trail[i] == CITY_UNKNOWN) {
-            // Useless (almost)
-            amountInfo += 1;
-        } else if (trail[i] == SEA_UNKNOWN) {
-            // Only 10 seas, pretty good info
-            amountInfo += 5;
+        if (trail[i] == SEA_UNKNOWN) {
+            // Only 10 seas, not much info
+            amountInfo += max(0, 1 - (0.1 * i));
         } else if (trail[i] >= ALICANTE && trail[i] <= BLACK_SEA) {
             // We know for sure where he was at some point - definitely worth it
-            amountInfo += 100;
+            amountInfo += max(1, 10 - i);
         }
     }
     
     // Wow, such arbitrary
-    return amountInfo > 18;
+    return amountInfo;
 }
 
 void generateMessage(HunterView hView, char *message) {
@@ -521,14 +532,16 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, playerLoc, player,
                                              curRound, TRUE, TRUE, TRUE);
     
+    int draculaAtSea = FALSE;
+    if (draculaTrail[0] == SEA_UNKNOWN) {
+        draculaAtSea = TRUE;
+    } else if (draculaTrail[0] >= NORTH_SEA && draculaTrail[0] <= BLACK_SEA) {
+        draculaAtSea = draculaTrail[0];
+    }
+
     LocationID location;
     printf("%d possible paths\n", numPaths);
-    for (location = 0; location < NUM_MAP_LOCATIONS; location++) {
-        // Can't meet dracula at sea, ignore sea
-        if (location >= NORTH_SEA && location <= BLACK_SEA) {
-            continue;
-        }
-        
+    for (location = 0; location < NUM_MAP_LOCATIONS; location++) {        
         // Probabilities
         double pHere = (double)probableNow[location] / numPaths;
         double pNext = (double)probableNext[location] / numPaths;
@@ -563,16 +576,25 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         printf("#%d: %lf(%s)\n", i+1, highScore[i], names[highScoreID[i]]);
     }
     
-    double spreadCoeff;
-    if (enoughInformation(draculaTrail)) {
-        spreadCoeff = 1;
-    } else {
-        spreadCoeff = 2;
+    // spreadCoeff should be between 0.5 and 1.8
+    double amountOfInfo = amountInformation(draculaTrail);
+    printf("amountOfInfo = %lf\n", amountOfInfo);
+    double spreadCoeff = 1.8;
+    if (amountOfInfo > 0.1) {
+        spreadCoeff = (double)5 / amountOfInfo;
+        spreadCoeff = min(1.8, spreadCoeff);
+        spreadCoeff = max(0.5, spreadCoeff);
     }
+    printf("spreadCoeff = %lf\n", spreadCoeff);
+
     double bestMoveScore = 0;
     LocationID moveLocation = playerLoc;
     for (i = 0; i < numAdjLocs; i++) {
         LocationID curLocation = adjLocs[i];
+        if (draculaAtSea == TRUE) {
+            // If dracula is at some unknown sea, don't take sea
+            continue;
+        }
         int k;
         double distToPlayers = 0;
         for (k = 0; k < NUM_PLAYERS - 1; k++) {
