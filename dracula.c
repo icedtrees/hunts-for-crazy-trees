@@ -5,6 +5,7 @@
 #include "game.h"
 #include "HunterView.h"
 #include "locations.h"
+#include "Queue.h"
 
 #define printf(...)
 
@@ -62,6 +63,94 @@ int inArray(LocationID *array, LocationID location, int length) {
     return FALSE;
 }
 
+
+static int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID **path, int curDistance) {
+    if (curLoc == source) {
+        *path = malloc(curDistance * sizeof(LocationID));
+        (*path)[0] = source;
+        return 1;
+    }
+    int len = rPush(source, backtrace[curLoc], backtrace, path, curDistance + 1) + 1;
+    (*path)[len-1] = curLoc;
+    
+    return len;
+}
+
+
+// Returns distance of path and array containing path by reference
+// Returns -1 if no path found
+static int shortestPathNextTurn(HunterView hView, LocationID source, LocationID dest, LocationID **path) {
+    int found = FALSE;
+    int i;
+
+    int seen[NUM_MAP_LOCATIONS];
+    LocationID backtrace[NUM_MAP_LOCATIONS];
+    for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
+        seen[i] = FALSE;
+        backtrace[i] = -1;
+    }
+    Round startRound = getRound(hView);
+    PlayerID player = getCurrentPlayer(hView);
+
+    Queue q = QueueCreate();
+    QueuePush(q, source, source, startRound);
+    while (!QueueEmpty(q)) {
+        queueData data = QueuePop(q);
+        if (seen[data.location]) {
+            continue;
+        }
+        seen[data.location] = TRUE;
+        backtrace[data.location] = data.from;
+        if (data.location == dest) {
+            found = TRUE;
+            break;
+        }
+
+        int numAdjLocs;
+        LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, data.location, player,
+                                                 data.round + 1, TRUE, TRUE, TRUE);
+        for (i = 0; i < numAdjLocs; i++) {
+            if (!seen[adjLocs[i]]) {
+                QueuePush(q, adjLocs[i], data.location, data.round + 2);
+            }
+        }
+        free(adjLocs);
+    }
+    QueueDispose(q);
+    if (found) {
+        int temp = rPush(source, dest, backtrace, path, 1);
+        return temp;
+    } else {
+        return -1;
+    }
+}
+
+LocationID furthestValidCity(GameView g, LocationID *trail) {
+    // Returns the non-sea location furthest from any hunter    
+    HunterView hView = gameGetHunterView(g);
+    int numConnected;
+    LocationID *validCities = connectedLocations(hView, &numConnected, gameGetLocation(g, PLAYER_DRACULA), PLAYER_DRACULA, getRound(hView), TRUE, FALSE, TRUE);
+    int currentMaxDistance = -1;
+    int currentBestCity = UNKNOWN_LOCATION;
+    int i;
+    for (i = 0; i < numConnected; i ++) {
+        int minHunterDistance = 100; // large
+        int hunter;
+        for (hunter = 0; hunter < NUM_PLAYERS - 1; hunter ++) {
+            LocationID *path = NULL;
+            int distance = shortestPathNextTurn(hView, gameGetLocation(g, hunter), validCities[i], &path);
+            if (distance < minHunterDistance) {
+                minHunterDistance = distance;
+            }
+        }
+        if (minHunterDistance > currentMaxDistance && !inArray(trail, validCities[i], 6)) {
+            currentMaxDistance = minHunterDistance;
+            currentBestCity = validCities[i];
+        }
+    }
+    return currentBestCity;
+}
+
 void decideMoveDracula (GameView g) {
     printf("Dracula: YAY it's my turn!\n");
     LocationID curLocation = gameGetLocation(g, PLAYER_DRACULA);
@@ -90,7 +179,7 @@ void decideMoveDracula (GameView g) {
         registerBestPlay("TP", "");
         return;
     }
-    
+    /*
     int direction = genRand(1, numAdjLocs - 1);
     printf("Dracula: Rolled a %d from %d to %d\n", direction, 1, numAdjLocs);
     printf("Dracula: I have decided to go to %s!\n", names[adjLocs[direction]]);
@@ -112,6 +201,11 @@ void decideMoveDracula (GameView g) {
     } else {
         strcpy(bestMove, names[adjLocs[direction]]);
     }
+    */
+
+    char bestMove[3];    
+    LocationID furthest = furthestValidCity(g, trail);
+    strcpy(bestMove, names[furthest]);
     
     printf("Dracula: I will go to %s\n", bestMove);
     registerBestPlay(bestMove, "");

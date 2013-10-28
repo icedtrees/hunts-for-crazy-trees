@@ -223,6 +223,9 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
         if (trail[i] == UNKNOWN_LOCATION || histories[PLAYER_DRACULA][i] == UNKNOWN_LOCATION) {
             break;
         }
+        if (trail[i] == ST_JOSEPH_AND_ST_MARYS) {
+            return FALSE;
+        }
 
         // check that any double backs or hides match, otherwise
         // check that city is not in trail
@@ -254,9 +257,9 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
                 return FALSE;
             }
         } else {
-            // check that the city is not in the trail
+            // check that the city is not in 6 range
             int j;
-            for (j = i + 1; j < TRAIL_SIZE; j ++) {
+            for (j = i + 1; j < 6; j ++) {
                 if (trail[i] == trail[j]) {
                     return FALSE;
                 }
@@ -303,7 +306,7 @@ static int inArray(LocationID *array, LocationID location, int length) {
 
 // Recursively go through backtrace and create an array of the path
 // Returns the length of the path
-int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID **path, int curDistance) {
+static int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID **path, int curDistance) {
     if (curLoc == source) {
         *path = malloc(curDistance * sizeof(LocationID));
         (*path)[0] = source;
@@ -585,8 +588,8 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         int k;
         int bestScore = 0;
         for (k = 0; k < numAdjLocs; k++) {
-            printf("iterating through adjLoc %d(%s)\n", k, names[k]);
-            printf("destination is %d(%s)\n", destination, names[destination]);
+            //printf("iterating through adjLoc %d(%s)\n", k, names[k]);
+            //printf("destination is %d(%s)\n", destination, names[destination]);
             LocationID *pathToTake = NULL;
             int distanceScore = shortestPath(hView, adjLocs[k], destination, &pathToTake);
             printf("found shortest path!\n");
@@ -601,7 +604,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             }
             
             int totalScore = 200 + (5 * spreadScore) - (10 * distanceScore);
-            printf("City: %s, Dist: %d, Spread: %d, Total: %d\n", names[adjLocs[k]], distanceScore, spreadScore, totalScore);
+            //printf("City: %s, Dist: %d, Spread: %d, Total: %d\n", names[adjLocs[k]], distanceScore, spreadScore, totalScore);
             if (totalScore > bestScore) {
                 //printf("Best score, go for it\n");
                 bestScore = totalScore;
