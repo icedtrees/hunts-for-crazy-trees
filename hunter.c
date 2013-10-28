@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
-#include <math.h>
 #include "game.h"
 #include "HunterView.h"
 #include "hunter.h"
@@ -319,6 +318,12 @@ static int inArray(LocationID *array, LocationID location, int length) {
         }
     }
     return FALSE;
+}
+
+double sqrt(double number) {
+    double root;
+    for (root = 0; root * root < number; root += 0.01);
+    return root;
 }
 
 // Recursively go through backtrace and create an array of the path
