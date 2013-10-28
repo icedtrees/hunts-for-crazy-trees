@@ -15,7 +15,7 @@
 
 #define MAX_MESSAGE_SIZE 128
 
-//#define printf(...)
+#define printf(...)
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
