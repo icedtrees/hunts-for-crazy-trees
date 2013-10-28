@@ -9,7 +9,7 @@
 #include <string.h>
 #include <assert.h>
 
-//#define printf(...)
+#define printf(...)
 
 typedef struct _node *Node;
 typedef struct _node {
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
     while (g->hView->curScore > 0 && g->hView->players[PLAYER_DRACULA]->health > 0) {
         printf("GAME: A new turn! enter to continue..\n");
         fflush(stdout);
-        getchar();
+        // getchar();
         if (getCurrentPlayer(g->hView) < PLAYER_DRACULA) {
             // Current player is a hunter
             decideMove(g->hView);

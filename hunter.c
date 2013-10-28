@@ -15,7 +15,8 @@
 
 #define MAX_MESSAGE_SIZE 128
 
-//#define printf(...)
+#define printf(...)
+#define sqrt 
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
@@ -266,6 +267,10 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_5) {
             if (i < TRAIL_SIZE - 5 && trail[i] != trail[i + 5]) {
+                return FALSE;
+            }
+        } else if (histories[PLAYER_DRACULA][i] == TELEPORT) {
+            if (trail[i] != CASTLE_DRACULA) {
                 return FALSE;
             }
         } else {

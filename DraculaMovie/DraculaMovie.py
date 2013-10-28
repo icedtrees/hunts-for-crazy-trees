@@ -97,8 +97,8 @@ while True:
 
     # move current player
     # if framesPassed * 10 // moveDelay < len(pastPlays):
-    if True:
-        # draw the next five plays
+    if startIndex < len(pastPlays):
+        # find next move
         # startIndex = framesPassed * 10 // moveDelay
         currentPlayer = players[pastPlays[startIndex][0]]
         currentMove = pastPlays[startIndex][1]
@@ -115,9 +115,12 @@ while True:
     screen.blit(europeMap, backgroundRect)
 
     # draw players on screen
+    if players["D"].currentCity != "??":
+        players["D"].display()
     for player in players.values():
-        if player.currentCity != "??":
-            player.display()
+        if (player.name != "D"):
+            if player.currentCity != "??":
+                player.display()
 
     pygame.display.flip()
     pygame.time.delay(10)
