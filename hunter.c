@@ -257,6 +257,10 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
             if (i < TRAIL_SIZE - 5 && trail[i] != trail[i + 5]) {
                 return FALSE;
             }
+        } else if (histories[PLAYER_DRACULA][i] == TELEPORT) {
+            if (trail[i] != CASTLE_DRACULA) {
+                return FALSE;
+            }
         } else {
             // check that the city is not in 6 range
             int j;
