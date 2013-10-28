@@ -10,35 +10,35 @@ HUNTER_FILES=$(HUNTER_VIEW_FILES) Queue.c hunter.c
 
 # Compile into object files for the hunter
 all: $(HUNTER_DEPENDENCIES)
-	$(CC) $(CFLAGS) -c $(HUNTER_FILES) -ljansson
+	$(CC) $(CFLAGS) -c $(HUNTER_FILES) -ljansson -lm
 
 # Game.c
 game: $(HUNTER_DEPENDENCIES) game.c dracula.c
-	$(CC) $(CFLAGS) -o game $(HUNTER_FILES) game.c dracula.c
+	$(CC) $(CFLAGS) -o game $(HUNTER_FILES) game.c dracula.c -lm
 
 # Tests for the hunter.c
 hunterTests: testHunter0 testHunter1 testHunter2 testHunter3 testHunter4 testHunter5 testHunter6
 
 testHunter0: $(HUNTER_DEPENDENCIES) testHunter0.c
-	$(CC) $(CFLAGS) -o testHunter0 $(HUNTER_FILES) testHunter0.c
+	$(CC) $(CFLAGS) -o testHunter0 $(HUNTER_FILES) testHunter0.c -lm
 
 testHunter1: $(HUNTER_DEPENDENCIES) testHunter1.c
-	$(CC) $(CFLAGS) -o testHunter1 $(HUNTER_FILES) testHunter1.c
+	$(CC) $(CFLAGS) -o testHunter1 $(HUNTER_FILES) testHunter1.c -lm
 
 testHunter2: $(HUNTER_DEPENDENCIES) testHunter2.c
-	$(CC) $(CFLAGS) -o testHunter2 $(HUNTER_FILES) testHunter2.c
+	$(CC) $(CFLAGS) -o testHunter2 $(HUNTER_FILES) testHunter2.c -lm
 
 testHunter3: $(HUNTER_DEPENDENCIES) testHunter3.c
-	$(CC) $(CFLAGS) -o testHunter3 $(HUNTER_FILES) testHunter3.c
+	$(CC) $(CFLAGS) -o testHunter3 $(HUNTER_FILES) testHunter3.c -lm
 
 testHunter4: $(HUNTER_DEPENDENCIES) testHunter4.c
-	$(CC) $(CFLAGS) -o testHunter4 $(HUNTER_FILES) testHunter4.c
+	$(CC) $(CFLAGS) -o testHunter4 $(HUNTER_FILES) testHunter4.c -lm
     
 testHunter5: $(HUNTER_DEPENDENCIES) testHunter5.c
-	$(CC) $(CFLAGS) -o testHunter5 $(HUNTER_FILES) testHunter5.c
+	$(CC) $(CFLAGS) -o testHunter5 $(HUNTER_FILES) testHunter5.c -lm
     
 testHunter6: $(HUNTER_DEPENDENCIES) testHunter6.c
-	$(CC) $(CFLAGS) -o testHunter6 $(HUNTER_FILES) testHunter6.c
+	$(CC) $(CFLAGS) -o testHunter6 $(HUNTER_FILES) testHunter6.c -lm
 
 # Tests for the HunterView.c
 hunterViewTests: testHunterView testHunterView1 testHunterView2 testHunterView3 testHunterView4
