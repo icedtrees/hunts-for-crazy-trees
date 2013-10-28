@@ -179,33 +179,35 @@ void decideMoveDracula (GameView g) {
         registerBestPlay("TP", "");
         return;
     }
-    /*
-    int direction = genRand(1, numAdjLocs - 1);
-    printf("Dracula: Rolled a %d from %d to %d\n", direction, 1, numAdjLocs);
-    printf("Dracula: I have decided to go to %s!\n", names[adjLocs[direction]]);
-    printf("Dracula: Don't forget my trail is: ");
-    int i;
-    for (i = 0; i < TRAIL_SIZE; i++) {
-        printf("%d(%s) ", trail[i], names[trail[i]]);
-    }
-    printf("\n");
-    
-    while (inArray(trail, adjLocs[direction], TRAIL_SIZE) && direction < numAdjLocs) {
-        printf("Dracula: oh, I can't go there...ok then =[\n");
-        direction = genRand(1, numAdjLocs - 1);
-    }
-    char bestMove[3];
-    if (direction >= numAdjLocs) {
-        printf("Dracula: gg can't go anywhere not moving anymore\n");
-        strcpy(bestMove, names[curLocation]);
-    } else {
-        strcpy(bestMove, names[adjLocs[direction]]);
-    }
-    */
+
+
 
     char bestMove[3];    
     LocationID furthest = furthestValidCity(g, trail);
-    strcpy(bestMove, names[furthest]);
+    if (furthest != UNKNOWN_LOCATION) {
+        strcpy(bestMove, names[furthest]);
+    } else {
+        int direction = genRand(1, numAdjLocs - 1);
+        printf("Dracula: Rolled a %d from %d to %d\n", direction, 1, numAdjLocs);
+        printf("Dracula: I have decided to go to %s!\n", names[adjLocs[direction]]);
+        printf("Dracula: Don't forget my trail is: ");
+        int i;
+        for (i = 0; i < TRAIL_SIZE; i++) {
+            printf("%d(%s) ", trail[i], names[trail[i]]);
+        }
+        printf("\n");
+        
+        while (inArray(trail, adjLocs[direction], TRAIL_SIZE) && direction < numAdjLocs) {
+            printf("Dracula: oh, I can't go there...ok then =[\n");
+            direction = genRand(1, numAdjLocs - 1);
+        }
+        if (direction >= numAdjLocs) {
+            printf("Dracula: gg can't go anywhere not moving anymore\n");
+            strcpy(bestMove, names[curLocation]);
+        } else {
+            strcpy(bestMove, names[adjLocs[direction]]);
+        }
+    }
     
     printf("Dracula: I will go to %s\n", bestMove);
     registerBestPlay(bestMove, "");

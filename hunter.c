@@ -402,6 +402,7 @@ void findDistances(HunterView hView, LocationID source, PlayerID player, int dis
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths) {
     // Uses the relevant trail data to predict where dracula could move next, and have the
     // hunter move accordingly
+    int isInCastleDracula = FALSE;
 
     // Store all the current state information
     PlayerID player = getCurrentPlayer(hView);
@@ -425,9 +426,15 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     int i;
     // First see if we should research if not enough info
     LocationID draculaTrail[TRAIL_SIZE];
+    
     int trailSize = 0;
     int numUnknown = 0;
     getHistory(hView, PLAYER_DRACULA, draculaTrail);
+    
+    if (draculaTrail[0] == CASTLE_DRACULA) {
+        isInCastleDracula = TRUE;
+    }
+    
     for (i = 0; i < 8; i++) {
         trailSize++;
         if (draculaTrail[i] == UNKNOWN_LOCATION) {
@@ -616,4 +623,8 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
             
     free(adjLocs);
     strcpy(bestMove, names[firstStep]);
+    
+    if (isInCastleDracula) {
+        fprintf(stdout, "Dracula is in Castle Dracula and destination is %d(%s)\n", destination, names[destination]);
+    }
 }
