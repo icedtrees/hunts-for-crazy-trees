@@ -405,6 +405,20 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     LocationID playerLoc = getLocation(hView, player);
     Round curRound = getRound(hView);
 
+    // If we don't have a location yet
+    if (playerLoc == UNKNOWN_LOCATION) {
+        if (player == PLAYER_LORD_GODALMING) {
+            strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
+        } else if (player == PLAYER_DR_SEWARD) {
+            strcpy(bestMove, names[HAMBURG]);
+        } else if (player == PLAYER_VAN_HELSING) {
+            strcpy(bestMove, names[GENOA]);
+        } else if (player == PLAYER_MINA_HARKER) {
+            strcpy(bestMove, names[TOULOUSE]);
+        }
+        return;
+    }
+
     int i;
     // First see if we should research if not enough info
     LocationID draculaTrail[TRAIL_SIZE];
@@ -434,19 +448,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         return;
     }
     
-    // If we don't have a location yet
-    if (playerLoc == UNKNOWN_LOCATION) {
-        if (player == PLAYER_LORD_GODALMING) {
-            strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
-        } else if (player == PLAYER_DR_SEWARD) {
-            strcpy(bestMove, names[HAMBURG]);
-        } else if (player == PLAYER_VAN_HELSING) {
-            strcpy(bestMove, names[GENOA]);
-        } else if (player == PLAYER_MINA_HARKER) {
-            strcpy(bestMove, names[TOULOUSE]);
-        }
-        return;
-    }
+
     
     // Create a probability array of possible locations Dracula could be in this turn
     int probableNow[NUM_MAP_LOCATIONS];
