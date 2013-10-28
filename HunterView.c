@@ -183,31 +183,31 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
         if (curPlayer == PLAYER_DRACULA) {
             if (curPlay[5] == 'V') {
                 // vampire matured, -13 score
-                hunterView->curScore -= 13;
+                hunterView->curScore -= SCORE_LOSS_VAMPIRE_MATURES;
             }
             
             // special cases at end of turn
             if (realDest == SEA_UNKNOWN ||
                 (realDest >= NORTH_SEA && realDest <= BLACK_SEA)) {
-                hunterView->players[curPlayer]->health -= 2;
+                hunterView->players[curPlayer]->health -= LIFE_LOSS_SEA;
             } else if (realDest == CASTLE_DRACULA || realDest == TELEPORT) {
-                hunterView->players[curPlayer]->health += 10;
+                hunterView->players[curPlayer]->health += LIFE_GAIN_CASTLE_DRACULA;
             }
         } else {
             // hunter
             for (j = 3; j < 7; j++) {
                 if (curPlay[j] == 'T') {
                     // trap activated, -2 health
-                    hunterView->players[curPlayer]->health -= 2;
+                    hunterView->players[curPlayer]->health -= LIFE_LOSS_TRAP_ENCOUNTER;
                 } else if (curPlay[j] == 'D') {
                     // found Dracula, -4 health and -10 for Dracula
-                    hunterView->players[curPlayer]->health -= 4;
-                    hunterView->players[PLAYER_DRACULA]->health -= 10;
+                    hunterView->players[curPlayer]->health -= LIFE_LOSS_DRACULA_ENCOUNTER;
+                    hunterView->players[PLAYER_DRACULA]->health -= LIFE_LOSS_HUNTER_ENCOUNTER;
                 }
             }
             if (hunterView->players[curPlayer]->health <= 0) {
                 // hunter died, full health and tp to hospital
-                hunterView->curScore -= 6;
+                hunterView->curScore -= SCORE_LOSS_HUNTER_HOSPITAL;
                 hunterView->players[curPlayer]->health = GAME_START_HUNTER_LIFE_POINTS;
                 hunterView->players[curPlayer]->curLoc = ST_JOSEPH_AND_ST_MARYS;
             } else {
@@ -215,7 +215,7 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
                 // didn't move, rested
                 // TODO find out if rest first or not
                 int curHealth = hunterView->players[curPlayer]->health;
-                hunterView->players[curPlayer]->health = min(curHealth + 3, GAME_START_HUNTER_LIFE_POINTS);
+                hunterView->players[curPlayer]->health = min(curHealth + LIFE_GAIN_REST, GAME_START_HUNTER_LIFE_POINTS);
             }
             }
         }
