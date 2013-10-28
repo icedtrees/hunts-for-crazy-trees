@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 #include "game.h"
 #include "HunterView.h"
 #include "hunter.h"
@@ -14,7 +15,7 @@
 
 #define MAX_MESSAGE_SIZE 128
 
-#define printf(...)
+//#define printf(...)
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
@@ -114,7 +115,7 @@ int enoughInformation(LocationID trail[TRAIL_SIZE]) {
     }
     
     // Wow, such arbitrary
-    return amountInfo > 12;
+    return amountInfo > 18;
 }
 
 void generateMessage(HunterView hView, char *message) {
@@ -223,6 +224,9 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
         if (trail[i] == UNKNOWN_LOCATION || histories[PLAYER_DRACULA][i] == UNKNOWN_LOCATION) {
             break;
         }
+        if (trail[i] == ST_JOSEPH_AND_ST_MARYS) {
+            return FALSE;
+        }
 
         // check that any double backs or hides match, otherwise
         // check that city is not in trail
@@ -254,9 +258,9 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
                 return FALSE;
             }
         } else {
-            // check that the city is not in the trail
+            // check that the city is not in 6 range
             int j;
-            for (j = i + 1; j < TRAIL_SIZE; j ++) {
+            for (j = i + 1; j < 6; j ++) {
                 if (trail[i] == trail[j]) {
                     return FALSE;
                 }
@@ -303,7 +307,7 @@ static int inArray(LocationID *array, LocationID location, int length) {
 
 // Recursively go through backtrace and create an array of the path
 // Returns the length of the path
-int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID **path, int curDistance) {
+static int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID **path, int curDistance) {
     if (curLoc == source) {
         *path = malloc(curDistance * sizeof(LocationID));
         (*path)[0] = source;
@@ -399,18 +403,43 @@ void findDistances(HunterView hView, LocationID source, PlayerID player, int dis
 void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, int numPaths) {
     // Uses the relevant trail data to predict where dracula could move next, and have the
     // hunter move accordingly
+    int isInCastleDracula = FALSE;
 
     // Store all the current state information
     PlayerID player = getCurrentPlayer(hView);
     LocationID playerLoc = getLocation(hView, player);
     Round curRound = getRound(hView);
+    LocationID myHistory[TRAIL_SIZE];
+    getHistory(hView, player, myHistory);
+    LocationID draculaTrail[TRAIL_SIZE];
+    getHistory(hView, PLAYER_DRACULA, draculaTrail);
+
+    // If we don't have a location yet
+    if (playerLoc == UNKNOWN_LOCATION) {
+        if (player == PLAYER_LORD_GODALMING) {
+            strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
+        } else if (player == PLAYER_DR_SEWARD) {
+            strcpy(bestMove, names[HAMBURG]);
+        } else if (player == PLAYER_VAN_HELSING) {
+            strcpy(bestMove, names[GENOA]);
+        } else if (player == PLAYER_MINA_HARKER) {
+            strcpy(bestMove, names[TOULOUSE]);
+        }
+        return;
+    }
 
     int i;
-    // First see if we should research if not enough info
+    /*// First see if we should research if not enough info
     LocationID draculaTrail[TRAIL_SIZE];
+    
     int trailSize = 0;
     int numUnknown = 0;
     getHistory(hView, PLAYER_DRACULA, draculaTrail);
+    
+    if (draculaTrail[0] == CASTLE_DRACULA) {
+        isInCastleDracula = TRUE;
+    }
+    
     for (i = 0; i < 8; i++) {
         trailSize++;
         if (draculaTrail[i] == UNKNOWN_LOCATION) {
@@ -432,21 +461,9 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         // no info, rest and research
         strcpy(bestMove, names[playerLoc]);
         return;
-    }
+    }*/
     
-    // If we don't have a location yet
-    if (playerLoc == UNKNOWN_LOCATION) {
-        if (player == PLAYER_LORD_GODALMING) {
-            strcpy(bestMove, names[ST_JOSEPH_AND_ST_MARYS]);
-        } else if (player == PLAYER_DR_SEWARD) {
-            strcpy(bestMove, names[HAMBURG]);
-        } else if (player == PLAYER_VAN_HELSING) {
-            strcpy(bestMove, names[GENOA]);
-        } else if (player == PLAYER_MINA_HARKER) {
-            strcpy(bestMove, names[TOULOUSE]);
-        }
-        return;
-    }
+
     
     // Create a probability array of possible locations Dracula could be in this turn
     int probableNow[NUM_MAP_LOCATIONS];
@@ -454,18 +471,20 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     int probableNext[NUM_MAP_LOCATIONS];
     // Distance from each hunter
     int distance[NUM_PLAYERS - 1][NUM_MAP_LOCATIONS];
+    double score[NUM_MAP_LOCATIONS];
     for (i = 0; i < NUM_PLAYERS - 1; i++) {
-        findDistances(hView, playerLoc, i, distance[i]);
+        findDistances(hView, getLocation(hView, i), i, distance[i]);
     }
     // TODO pass frequency...
     for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
         probableNow[i] = 0;
         probableNext[i] = 0;
+        score[i] = 0;
     }
     
     /*printf("Player %d at %s, distances:\n", player, names[playerLoc]);
     for (i = 0; i < NUM_MAP_LOCATIONS; i++) {
-        printf("%s: %d\n", names[i], distance[player][i]);
+        printf("%s: %d\n", names[i], distance[1][i]);
     }
     printf("\n");*/
     
@@ -501,114 +520,96 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     int numAdjLocs;
     LocationID *adjLocs = connectedLocations(hView, &numAdjLocs, playerLoc, player,
                                              curRound, TRUE, TRUE, TRUE);
-    LocationID destination = 0;
-    int highScore = 0;
+    
     LocationID location;
-    // Distance multiplier should be really very minor
-    // as it is only meant to break ties
-    int distanceMultiplier = 10 * numPaths;
     printf("%d possible paths\n", numPaths);
-    // goDirect is a flag to specifies whether to go directly to a point
-    // (usually adjacent square) or to take the path which spreads out the most.
-    int goDirect = FALSE;
     for (location = 0; location < NUM_MAP_LOCATIONS; location++) {
-        // How far are we from this location being considered?
-        // The closer we are the more relevant it is
+        // Can't meet dracula at sea, ignore sea
         if (location >= NORTH_SEA && location <= BLACK_SEA) {
             continue;
         }
-        LocationID *path = NULL;
-        int distanceToLoc = 20 - shortestPath(hView, playerLoc, location, &path);
-        free(path);
-        int curScore = 0;
-        int urgentCheck = FALSE;
-        // If we are next to the location being considered, high chance
-        // that we want to investigate it if there's a chance he's right there
-        if (inArray(adjLocs, location, numAdjLocs)) {
-            urgentCheck = TRUE;
-            curScore += 500 * probableNow[location] * numPaths;
-        }
-        curScore += 100 * probableNext[location] * numPaths;
-        int k;
-        for (k = 0; k < NUM_PLAYERS - 1; k++) {
-            if (k != player) {
-                curScore += distanceMultiplier * distance[k][location];
-            }
-        }
-        curScore *= distanceToLoc;
-        curScore /= 20;
-        if (curScore > highScore) {
-            if (urgentCheck == TRUE) {
-                goDirect = TRUE;
-                printf("Location %s is a good place to URGENTLY check out\n", names[location]);
-            } else {
-                goDirect = FALSE;
-                printf("Location %s is a good place to check out\n", names[location]);
-            }
-            highScore = curScore;
-            destination = location;
-        }
-    }
-    printf("I really think the best place to go is %s\n", names[destination]);
-    
-    LocationID firstStep = playerLoc; // Default move
-    if (goDirect) {
-        printf("Go direct! Get 'em boys!\n");
-        // Get the first step of the optimal path towards our destination
-        if (playerLoc != destination) {
-            LocationID *pathToTake = NULL;
-            int length = shortestPath(hView, playerLoc, destination, &pathToTake);
-
-            assert(length > 1);
-            if (pathToTake != NULL) {
-                firstStep = pathToTake[1];
-                free(pathToTake);
-            }
         
-            /*printf("Best place to go is %s\n", names[destination]);
-            printf("Path is: ");
-            int i;
-            for (i = 0; i < length; i++) {
-                printf("i is %d\n", i);
-                printf("pathToTake[i] is %d\n", pathToTake[i]);
-                printf("%s ", names[pathToTake[i]]);
-            }
-            printf("\n");*/
-        }
-        printf("Thus the first step to take is %s\n", names[firstStep]);
-    } else {
-        printf("Spreading out\n");
-        // Consider all first steps
-        // Score it based on shortest distance and greatest spread
+        // Probabilities
+        double pHere = (double)probableNow[location] / numPaths;
+        double pNext = (double)probableNext[location] / numPaths;
+        
+        double curScore = (10 * pHere) + (2 * pNext);
+        
+        score[location] = curScore;
+    }
+    double highScore[5] = {0, 0, 0, 0, 0};
+    int highScoreID[5];
+    for (i = 0; i < 5; i++) {
         int k;
-        int bestScore = 0;
-        for (k = 0; k < numAdjLocs; k++) {
-            printf("iterating through adjLoc %d(%s)\n", k, names[k]);
-            printf("destination is %d(%s)\n", destination, names[destination]);
-            LocationID *pathToTake = NULL;
-            int distanceScore = shortestPath(hView, adjLocs[k], destination, &pathToTake);
-            printf("found shortest path!\n");
-            assert(distanceScore != -1);
-            free(pathToTake);
-            int spreadScore = 0;
-            int h;
-            for (h = 0; h < NUM_PLAYERS - 1; h++) {
-                if (h != player) {
-                    spreadScore += distance[h][adjLocs[k]];
+        for (k = 0; k < NUM_MAP_LOCATIONS; k++) {
+            int j;
+            int skipThis = FALSE;
+            for (j = 0; j < i; j++) {
+                if (k == highScoreID[j]) {
+                    skipThis = TRUE;
                 }
             }
-            
-            int totalScore = 200 + (5 * spreadScore) - (10 * distanceScore);
-            printf("City: %s, Dist: %d, Spread: %d, Total: %d\n", names[adjLocs[k]], distanceScore, spreadScore, totalScore);
-            if (totalScore > bestScore) {
-                //printf("Best score, go for it\n");
-                bestScore = totalScore;
-                firstStep = adjLocs[k];
+            if (skipThis) {
+                continue;
+            }
+            if (score[k] > highScore[i]) {
+                highScore[i] = score[k];
+                highScoreID[i] = k;
             }
         }
-        printf("First step to tak is %s\n", names[firstStep]);
+    }
+    printf("Top 5 scored locations:\n");
+    for (i = 0; i < 5; i++) {
+        printf("#%d: %lf(%s)\n", i+1, highScore[i], names[highScoreID[i]]);
+    }
+    
+    double spreadCoeff;
+    if (enoughInformation(draculaTrail)) {
+        spreadCoeff = 1;
+    } else {
+        spreadCoeff = 2;
+    }
+    double bestMoveScore = 0;
+    LocationID moveLocation = playerLoc;
+    for (i = 0; i < numAdjLocs; i++) {
+        LocationID curLocation = adjLocs[i];
+        int k;
+        double distToPlayers = 0;
+        for (k = 0; k < NUM_PLAYERS - 1; k++) {
+            if (k != player) {
+                distToPlayers += distance[k][curLocation];
+            }
+        }
+        double distScore = sqrt(distToPlayers);
+        
+        double locationScore = 0;
+        for (k = 0; k < NUM_MAP_LOCATIONS; k++) {
+            LocationID *path = NULL;
+            locationScore += score[k] / sqrt(shortestPath(hView, adjLocs[i], k, &path));
+            free(path);
+        }
+        
+        double alreadyExplored = 0;
+        for (k = 0; k < TRAIL_SIZE; k++) {
+            if (curLocation == myHistory[k]) {
+                alreadyExplored = 1 - ((double)k*0.2);
+                break;
+            }
+        }
+        
+        double curScore = spreadCoeff * distScore + locationScore - alreadyExplored;
+        if (curScore > bestMoveScore) {
+            bestMoveScore = curScore;
+            moveLocation = adjLocs[i];
+        }
+        
+        printf("Score of moving to %s is %lf (%lf + %lf - %lf)\n", names[adjLocs[i]], curScore, spreadCoeff * distScore, locationScore, alreadyExplored);
     }
             
     free(adjLocs);
-    strcpy(bestMove, names[firstStep]);
+    strcpy(bestMove, names[moveLocation]);
+    
+    if (isInCastleDracula) {
+        fprintf(stdout, "Dracula is in Castle Dracula and destination is %d(%s)\n", moveLocation, names[moveLocation]);
+    }
 }
