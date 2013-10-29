@@ -1,1 +1,1 @@
-void decideMoveDracula (GameView g);
+void decideMoveDracula (GameView g, int playerControlled);

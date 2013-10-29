@@ -9,7 +9,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define printf(...)
+//#define printf(...)
 
 typedef struct _node *Node;
 typedef struct _node {
@@ -137,8 +137,8 @@ void confirmBestPlay();
 void disposeGameView(void);
 
 int main(int argc, char **argv) {
+    int seed;
     if (argc > 1) {
-        int seed;
         sscanf(argv[1], "%d", &seed);
         srand(seed);
     } else {
@@ -151,7 +151,7 @@ int main(int argc, char **argv) {
     while (g->hView->curScore > 0 && g->hView->players[PLAYER_DRACULA]->health > 0) {
         printf("GAME: A new turn! enter to continue..\n");
         fflush(stdout);
-        // getchar();
+        getchar();
         if (getCurrentPlayer(g->hView) < PLAYER_DRACULA) {
             // Current player is a hunter
             decideMove(g->hView);
@@ -159,8 +159,13 @@ int main(int argc, char **argv) {
         } else {
             // IT'S DRACULA AAA
             //registerBestPlay("CD", "");
-            decideMoveDracula(g);
-            confirmBestPlay();
+            if (seed == 0) {
+                decideMoveDracula(g, TRUE);
+                confirmBestPlay();
+            } else {
+                decideMoveDracula(g, FALSE);
+                confirmBestPlay();
+            }
         }
         printf("Score: %d, Dracula's health: %d\n", g->hView->curScore, g->hView->players[PLAYER_DRACULA]->health);
         printf("%s\n", g->pastPlays);

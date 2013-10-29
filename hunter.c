@@ -14,8 +14,7 @@
 
 #define MAX_MESSAGE_SIZE 128
 
-#define printf(...)
-//#define sqrt 
+//#define printf(...) 
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
@@ -213,6 +212,8 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             }
             // special move: teleport
             if (histories[PLAYER_DRACULA][lengthTrail] == TELEPORT) {
+                printf("ADDING TELEPORT TO THE TRAIL\n");
+                fflush(stdout);
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = CASTLE_DRACULA;
