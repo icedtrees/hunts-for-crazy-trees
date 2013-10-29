@@ -170,9 +170,28 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             }
         }
     } else {
-        generatedTrails = malloc(MAX_ADJACENT_LOCATIONS * numPrevious * sizeof(LocationID *));
+        if (lengthTrail < TRAIL_SIZE - 1 && histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
+            generatedTrails = malloc(NUM_MAP_LOCATIONS * numPrevious * sizeof(LocationID *));
+        } else {
+            generatedTrails = malloc(MAX_ADJACENT_LOCATIONS * numPrevious * sizeof(LocationID *));
+        }
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
+            // special move: teleport
+            if (histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
+                printf("ADDING TELEPORT TO THE TRAIL\n");
+                fflush(stdout);
+                LocationID currentCity;
+                for (currentCity = 0; currentCity < NUM_MAP_LOCATIONS; currentCity ++) {
+                    LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                    memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
+                    newPath[lengthTrail] = currentCity;
+                    generatedTrails[*numPaths] = newPath;
+                    *numPaths = *numPaths + 1;
+                }
+                continue;
+            }
+
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
 
             int newIndex = 0;
@@ -209,16 +228,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 } else {
                     free(newPath);
                 }
-            }
-            // special move: teleport
-            if (histories[PLAYER_DRACULA][lengthTrail] == TELEPORT) {
-                printf("ADDING TELEPORT TO THE TRAIL\n");
-                fflush(stdout);
-                LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
-                memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
-                newPath[lengthTrail] = CASTLE_DRACULA;
-                generatedTrails[*numPaths] = newPath;
-                *numPaths = *numPaths + 1;
             }
             
         }
