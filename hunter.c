@@ -12,6 +12,8 @@
 #define TRUE 1
 #define FALSE 0
 
+#define BLOOD_TRAIL 6
+
 #define MAX_MESSAGE_SIZE 128
 
 //#define printf(...) 
@@ -179,8 +181,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
             // special move: teleport
             if (histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
-                printf("ADDING TELEPORT TO THE TRAIL\n");
-                fflush(stdout);
                 LocationID currentCity;
                 for (currentCity = 0; currentCity < NUM_MAP_LOCATIONS; currentCity ++) {
                     LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
@@ -239,6 +239,9 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
     // Given a dracula trail where all cities are adjacent, verifies that it matches histories
     // and all double backs/hides are legitimate
+    int depth;
+    for (depth = 0; depth < TRAIL_SIZE && trail[depth] != -1; depth ++);
+    
     int i;
     for (i = 0; i < TRAIL_SIZE; i ++) {
         // Iterate through the trail dracula has made, check all locations/moves are valid
@@ -252,30 +255,30 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
         // check that any double backs or hides match, otherwise
         // check that city is not in trail
         if (histories[PLAYER_DRACULA][i] == HIDE) {
-            if (i < TRAIL_SIZE - 1 && trail[i] != trail[i + 1]) {
+            if (i < min(depth - 1, BLOOD_TRAIL) && trail[i] != trail[i + 1]) {
                 return FALSE;
-            } else if (trail[i + 1] >= NORTH_SEA && trail[i + 1] <= BLACK_SEA) {
+            } else if (i < min(depth - 1, BLOOD_TRAIL) && trail[i + 1] >= NORTH_SEA && trail[i + 1] <= BLACK_SEA) {
                 // dracula cannot hide at sea
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_1) {
-            if (i < TRAIL_SIZE - 1 && trail[i] != trail[i + 1]) {
+            if (i < min(depth - 1, BLOOD_TRAIL) && trail[i] != trail[i + 1]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_2) {
-            if (i < TRAIL_SIZE - 2 && trail[i] != trail[i + 2]) {
+            if (i < min(depth - 2, BLOOD_TRAIL) && trail[i] != trail[i + 2]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_3) {
-            if (i < TRAIL_SIZE - 3 && trail[i] != trail[i + 3]) {
+            if (i < min(depth - 3, BLOOD_TRAIL) && trail[i] != trail[i + 3]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_4) {
-            if (i < TRAIL_SIZE - 4 && trail[i] != trail[i + 4]) {
+            if (i < min(depth - 4, BLOOD_TRAIL) && trail[i] != trail[i + 4]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_5) {
-            if (i < TRAIL_SIZE - 5 && trail[i] != trail[i + 5]) {
+            if (i < min(depth - 5, BLOOD_TRAIL) && trail[i] != trail[i + 5]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == TELEPORT) {
