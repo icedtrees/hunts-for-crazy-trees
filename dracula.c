@@ -7,7 +7,7 @@
 #include "locations.h"
 #include "Queue.h"
 
-//#define printf(...)
+#define printf(...)
 
 /*
 static LocationID moveID(char a, char b) {
@@ -143,9 +143,11 @@ LocationID furthestValidCity(GameView g, LocationID *trail) {
                 minHunterDistance = distance;
             }
         }
-        if (minHunterDistance > currentMaxDistance && !inArray(trail, validCities[i], 6)) {
-            currentMaxDistance = minHunterDistance;
-            currentBestCity = validCities[i];
+        if (minHunterDistance > currentMaxDistance) {
+            if (!inArray(trail, validCities[i], 6)) {
+                currentMaxDistance = minHunterDistance;
+                currentBestCity = validCities[i];
+            }
         }
     }
     return currentBestCity;
@@ -203,7 +205,7 @@ void decideMoveDracula (GameView g, int playerControlled) {
             printf("Dracula: Don't forget my trail is: ");
             int i;
             for (i = 0; i < TRAIL_SIZE; i++) {
-                printf("%d(%s) ", trail[i], names[trail[i]]);
+                printf("%d %s ", trail[i], names[trail[i]]);
             }
             printf("\n");
             
