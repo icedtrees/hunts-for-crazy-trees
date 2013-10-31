@@ -190,8 +190,16 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                     *numPaths = *numPaths + 1;
                 }
                 continue;
+            // special moves: hide, D1
+            } else if (histories[PLAYER_DRACULA][lengthTrail - 1] == HIDE || histories[PLAYER_DRACULA][lengthTrail - 1] == DOUBLE_BACK_1) {
+                LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
+                newPath[lengthTrail] = trail[lengthTrail - 1];
+                generatedTrails[*numPaths] = newPath;
+                *numPaths = *numPaths + 1;
+                continue;
             }
-
+            
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
 
             int newIndex = 0;
