@@ -624,7 +624,7 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     LocationID moveLocation = playerLoc;
     for (i = 0; i < numAdjLocs; i++) {
         LocationID curLocation = adjLocs[i];
-        if (draculaAtSea == TRUE) {
+        if (draculaAtSea == TRUE && (curLocation >= NORTH_SEA && curLocation <= BLACK_SEA)) {
             // If dracula is at some unknown sea, don't take sea
             continue;
         }
