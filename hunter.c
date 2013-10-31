@@ -174,6 +174,8 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     } else {
         if (lengthTrail < TRAIL_SIZE - 1 && histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
             generatedTrails = malloc(NUM_MAP_LOCATIONS * numPrevious * sizeof(LocationID *));
+        } else if (histories[PLAYER_DRACULA][lengthTrail - 1] == HIDE || histories[PLAYER_DRACULA][lengthTrail - 1] == DOUBLE_BACK_1) {
+            generatedTrails = malloc(numPrevious * sizeof(LocationID *));
         } else {
             generatedTrails = malloc(MAX_ADJACENT_LOCATIONS * numPrevious * sizeof(LocationID *));
         }
@@ -194,7 +196,7 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             } else if (histories[PLAYER_DRACULA][lengthTrail - 1] == HIDE || histories[PLAYER_DRACULA][lengthTrail - 1] == DOUBLE_BACK_1) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
-                newPath[lengthTrail] = trail[lengthTrail - 1];
+                newPath[lengthTrail] = previousPaths[pathIndex][lengthTrail - 1];
                 generatedTrails[*numPaths] = newPath;
                 *numPaths = *numPaths + 1;
                 continue;
