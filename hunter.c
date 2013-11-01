@@ -298,7 +298,7 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
         } else {
             // check that the city is not in 6 range
             int j;
-            for (j = i + 1; j < 6; j ++) {
+            for (j = i + 1; j < BLOOD_TRAIL; j ++) {
                 if (trail[i] == trail[j]) {
                     return FALSE;
                 }
@@ -317,7 +317,7 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
             return FALSE;
         }
 
-        // check that the trail matches the locations of the hunters]
+        // check that the trail matches the locations of the hunters
         if (histories[PLAYER_DRACULA][i] == CITY_UNKNOWN) {
         PlayerID currentPlayer;
             for (currentPlayer = 0; currentPlayer < NUM_PLAYERS - 1; currentPlayer ++) {
