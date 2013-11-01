@@ -344,8 +344,12 @@ static int inArray(LocationID *array, LocationID location, int length) {
 }
 
 double sqrt(double number) {
+    // slightly optimised square root function - runs pretty fast
     double root;
+    for (root = 0; root * root < number; root += 1);
+    for (root = 0; root * root < number; root += 0.1);
     for (root = 0; root * root < number; root += 0.01);
+    for (root = 0; root * root < number; root += 0.001);
     return root;
 }
 
