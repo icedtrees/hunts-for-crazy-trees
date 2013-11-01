@@ -153,8 +153,8 @@ LocationID furthestValidCity(GameView g, LocationID *trail) {
     return currentBestCity;
 }
 
-void decideMoveDracula (GameView g, int playerControlled) {
-    if (playerControlled) {
+void decideMoveDracula (GameView g, int seed) {
+    if (seed == -1) {
         printf("Dracula, please make your move:\n");
         fflush(stdout);
         char moveString[3];
@@ -165,7 +165,7 @@ void decideMoveDracula (GameView g, int playerControlled) {
         LocationID curLocation = gameGetLocation(g, PLAYER_DRACULA);
         printf("Dracula: I am at %d(%s)\n", curLocation, names[curLocation]);
         if (curLocation == UNKNOWN_LOCATION) {
-            curLocation = genRand(0, 60);
+            curLocation = seed % NUM_MAP_LOCATIONS;
             char curLocationString[3];
             strcpy(curLocationString, names[curLocation]);
             registerBestPlay(curLocationString, "");

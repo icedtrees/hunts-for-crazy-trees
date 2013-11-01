@@ -16,7 +16,7 @@
 
 #define MAX_MESSAGE_SIZE 128
 
-#define printf(...) 
+//#define printf(...) 
 
 // When dracula is a in a location, he can travel to a maximum of eight other connected locations
 #define MAX_ADJACENT_LOCATIONS 8
@@ -471,14 +471,15 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
     int isInCastleDracula = FALSE;
 
     // Store all the current state information
+    int i;
     Round curRound = getRound(hView);
-    LocationID myHistory[TRAIL_SIZE];
-    getHistory(hView, player, myHistory);
+    LocationID allHistories[NUM_PLAYERS][TRAIL_SIZE];
+    for (i = 0; i < NUM_PLAYERS; i++) {
+        getHistory(hView, i, allHistories[i]);
+    }
     LocationID draculaTrail[TRAIL_SIZE];
     getHistory(hView, PLAYER_DRACULA, draculaTrail);
     
-
-    int i;
     /*// First see if we should research if not enough info
     LocationID draculaTrail[TRAIL_SIZE];
     
@@ -652,9 +653,12 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         
         double alreadyExplored = 0;
         for (k = 0; k < TRAIL_SIZE; k++) {
-            if (curLocation == myHistory[k]) {
-                alreadyExplored = 1 - ((double)k*0.2);
-                break;
+            int l;
+            for (l = 0; l < NUM_PLAYERS - 1; l++) {
+                if (curLocation == allHistories[l][k]) {
+                    alreadyExplored = 1 - ((double)k*0.2);
+                    break;
+                }
             }
         }
         

@@ -9,7 +9,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define printf(...)
+//#define printf(...)
 #define getchar(...)
 
 typedef struct _node *Node;
@@ -160,13 +160,8 @@ int main(int argc, char **argv) {
         } else {
             // IT'S DRACULA AAA
             //registerBestPlay("CD", "");
-            if (seed == 0) {
-                decideMoveDracula(g, TRUE);
-                confirmBestPlay();
-            } else {
-                decideMoveDracula(g, FALSE);
-                confirmBestPlay();
-            }
+            decideMoveDracula(g, seed);
+            confirmBestPlay();
         }
         printf("Score: %d, Dracula's health: %d\n", g->hView->curScore, g->hView->players[PLAYER_DRACULA]->health);
         printf("%s\n", g->pastPlays);
