@@ -265,41 +265,43 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
         // check that any double backs or hides match, otherwise
         // check that city is not in trail
         if (histories[PLAYER_DRACULA][i] == HIDE) {
-            if (i < min(depth - 1, BLOOD_TRAIL) && trail[i] != trail[i + 1]) {
+            if (i < depth - 1 && trail[i] != trail[i + 1]) {
                 return FALSE;
-            } else if (i < min(depth - 1, BLOOD_TRAIL) && trail[i + 1] >= NORTH_SEA && trail[i + 1] <= BLACK_SEA) {
+            } else if (i < depth - 1 && trail[i] >= NORTH_SEA && trail[i] <= BLACK_SEA) {
                 // dracula cannot hide at sea
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_1) {
-            if (i < min(depth - 1, BLOOD_TRAIL) && trail[i] != trail[i + 1]) {
+            if (i < depth - 1 && trail[i] != trail[i + 1]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_2) {
-            if (i < min(depth - 2, BLOOD_TRAIL) && trail[i] != trail[i + 2]) {
+            if (i < depth - 2 && trail[i] != trail[i + 2]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_3) {
-            if (i < min(depth - 3, BLOOD_TRAIL) && trail[i] != trail[i + 3]) {
+            if (i < depth - 3 && trail[i] != trail[i + 3]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_4) {
-            if (i < min(depth - 4, BLOOD_TRAIL) && trail[i] != trail[i + 4]) {
+            if (i < depth - 4 && trail[i] != trail[i + 4]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == DOUBLE_BACK_5) {
-            if (i < min(depth - 5, BLOOD_TRAIL) && trail[i] != trail[i + 5]) {
+            if (i < depth - 5 && trail[i] != trail[i + 5]) {
                 return FALSE;
             }
         } else if (histories[PLAYER_DRACULA][i] == TELEPORT) {
             if (trail[i] != CASTLE_DRACULA) {
                 return FALSE;
             }
+            // teleporting has to be from somewhere with no legal moves
+            // do later
         } else {
-            // check that the city is not in 6 range
+            // check that the city is not in trail (now BLOOD_TRAIL - 1)
             int j;
-            for (j = i + 1; j < BLOOD_TRAIL; j ++) {
-                if (trail[i] == trail[j]) {
+            for (j = i + 1; j < depth && j < i + BLOOD_TRAIL; j ++) {
+                if (trail[i] == trail[j] && histories[PLAYER_DRACULA][j] < HIDE) { // also standard move
                     return FALSE;
                 }
             }
