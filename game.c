@@ -9,7 +9,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define printf(...)
+//#define printf(...)
 #define getchar(...)
 
 typedef struct _node *Node;
