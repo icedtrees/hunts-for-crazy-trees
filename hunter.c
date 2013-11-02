@@ -197,8 +197,12 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = previousPaths[pathIndex][lengthTrail - 1];
-                generatedTrails[*numPaths] = newPath;
-                *numPaths = *numPaths + 1;
+                if (validDraculaTrail(histories, newPath)) {
+                    generatedTrails[*numPaths] = newPath;
+                    *numPaths = *numPaths + 1;
+                } else {
+                    free(newPath);
+                }
                 continue;
             }
             
@@ -253,14 +257,8 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
     for (depth = 0; depth < TRAIL_SIZE && trail[depth] != -1; depth ++);
     
     int i;
-    for (i = 0; i < TRAIL_SIZE; i ++) {
+    for (i = 0; i < depth; i ++) {
         // Iterate through the trail dracula has made, check all locations/moves are valid
-        if (trail[i] == UNKNOWN_LOCATION || histories[PLAYER_DRACULA][i] == UNKNOWN_LOCATION) {
-            break;
-        }
-        if (trail[i] == ST_JOSEPH_AND_ST_MARYS) {
-            return FALSE;
-        }
 
         // check that any double backs or hides match, otherwise
         // check that city is not in trail
@@ -307,7 +305,6 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
             }
         }
 
-        
         // Check that dracula history matches the location in trail
         if (histories[PLAYER_DRACULA][i] < NUM_MAP_LOCATIONS && histories[PLAYER_DRACULA][i] != trail[i]) {
             return FALSE;
