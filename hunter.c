@@ -205,7 +205,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             if (histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
                 LocationID currentCity;
                 for (currentCity = 0; currentCity < NUM_MAP_LOCATIONS; currentCity ++) {
-                    fflush(stdout);
                     LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
                     fflush(stdout);
                     if (newPath == NULL) {
