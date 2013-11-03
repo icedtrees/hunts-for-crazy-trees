@@ -155,8 +155,6 @@ void generateMessage(HunterView hView, char *message) {
 LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail) {
     // Accepts trails of length n as input, and generates trails of length n + 1 as output
     
-    printf("trying to get dracula trails\n");
-    
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
     int numPrevious = *numPaths;
     *numPaths = 0;
@@ -199,8 +197,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
         }
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
-            printf("pathIndex is %d\n", pathIndex);
-            printf("previous (future) move was %s\n", names[histories[PLAYER_DRACULA][lengthTrail - 1]]);
             // special move: teleport
             if (histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
                 LocationID currentCity;
