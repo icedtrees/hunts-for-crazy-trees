@@ -205,11 +205,8 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             if (histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
                 LocationID currentCity;
                 for (currentCity = 0; currentCity < NUM_MAP_LOCATIONS; currentCity ++) {
-                    printf("currentCity is %d\n", currentCity);
-                    printf("trying to malloc %d bytes of memory\n", TRAIL_SIZE * sizeof(LocationID));
                     fflush(stdout);
                     LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
-                    printf("malloced\n");
                     fflush(stdout);
                     if (newPath == NULL) {
                        return NULL;
@@ -217,16 +214,13 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                     memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                     newPath[lengthTrail] = currentCity;
                     if (validDraculaTrail(histories, newPath)) {
-                        printf("the tp was valid\n");
                         generatedTrails[*numPaths] = newPath;
                         *numPaths = *numPaths + 1;
                         continue;
                     } else {
-                        printf("the tp was not valid\n");
                         free(newPath);
                     }
                 }
-                printf("continuing\n");
                 continue;
             // special moves: hide, D1
             } else if (histories[PLAYER_DRACULA][lengthTrail - 1] == HIDE || histories[PLAYER_DRACULA][lengthTrail - 1] == DOUBLE_BACK_1) {
