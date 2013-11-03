@@ -14,7 +14,6 @@ void printDraculaTrails(LocationID **trails, int numTrails) {
     for (i = 0; i < numTrails; i ++) {
         int j;
         for (j = 0; j < TRAIL_SIZE; j ++) {
-            printf("i is %d, j is %d\n", i, j);
             if (trails[i][j] == UNKNOWN_LOCATION) {
                 printf("X");
             } else {
