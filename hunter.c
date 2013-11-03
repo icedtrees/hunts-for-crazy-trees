@@ -76,7 +76,7 @@ void decideMove(HunterView hView) {
         previousNumPaths = numPaths;
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
-        if (draculaTrails = NULL) { // ran out of memory
+        if (draculaTrails == NULL) { // ran out of memory
             int i;
             for (i = 0; i < previousNumPaths; i ++) {
                 free(previousTrails[i]);
