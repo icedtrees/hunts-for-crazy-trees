@@ -163,10 +163,16 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
     
     // Generate all the possible trails
     if (lengthTrail == 0) { // previous paths not relevant
-        generatedTrails = malloc(NUM_MAP_LOCATIONS * sizeof(LocationID *)); 
+        generatedTrails = malloc(NUM_MAP_LOCATIONS * sizeof(LocationID *));
+        if (generatedTrails == NULL) {
+            return NULL;
+        }
         LocationID currentLocation;
         for (currentLocation = 0; currentLocation < NUM_MAP_LOCATIONS; currentLocation ++) {
             LocationID *initialTrail = malloc(TRAIL_SIZE * sizeof(LocationID));
+            if (initialTrail == NULL) {
+                return NULL;
+            }
             initialTrail[0] = currentLocation;
             int i;
             for (i = 1; i < TRAIL_SIZE; i ++) {
@@ -197,6 +203,9 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 LocationID currentCity;
                 for (currentCity = 0; currentCity < NUM_MAP_LOCATIONS; currentCity ++) {
                     LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                    if (newPath == NULL) {
+                       return NULL;
+                   }
                     memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                     newPath[lengthTrail] = currentCity;
                     generatedTrails[*numPaths] = newPath;
@@ -206,6 +215,9 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             // special moves: hide, D1
             } else if (histories[PLAYER_DRACULA][lengthTrail - 1] == HIDE || histories[PLAYER_DRACULA][lengthTrail - 1] == DOUBLE_BACK_1) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                if (newPath == NULL) {
+                    return NULL;
+                }
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = previousPaths[pathIndex][lengthTrail - 1];
                 if (validDraculaTrail(histories, newPath)) {
@@ -223,6 +235,9 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             // add all possible land moves
             for (newIndex = 0; adjacencyRoad[lastCity][newIndex] != END; newIndex ++) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                if (newPath == NULL) {
+                    return NULL;
+                }
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 if (adjacencyRoad[lastCity][newIndex] > NUM_MAP_LOCATIONS || adjacencyRoad[lastCity][newIndex] < 0) {
                     printf("SOMETHING SERIOUSLY WRONG\n");
@@ -245,6 +260,9 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             // add all possible sea moves
             for (newIndex = 0; adjacencySea[lastCity][newIndex] != END; newIndex ++) {
                 LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                if (newPath == NULL) {
+                    return NULL;
+                }
                 memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                 newPath[lengthTrail] = adjacencySea[lastCity][newIndex];
                 if (validDraculaTrail(histories, newPath)) {
@@ -368,10 +386,16 @@ double sqrt(double number) {
 static int rPush(LocationID source, LocationID curLoc, LocationID backtrace[], LocationID **path, int curDistance) {
     if (curLoc == source) {
         *path = malloc(curDistance * sizeof(LocationID));
+        if (*path == NULL) {
+            return -1;
+        }
         (*path)[0] = source;
         return 1;
     }
     int len = rPush(source, backtrace[curLoc], backtrace, path, curDistance + 1) + 1;
+    if (len == -1) {
+        return -1;
+    }
     (*path)[len-1] = curLoc;
     
     return len;
@@ -419,9 +443,12 @@ int shortestPath(HunterView hView, LocationID source, LocationID dest, LocationI
     QueueDispose(q);
     if (found) {
         int temp = rPush(source, dest, backtrace, path, 1);
+        if (temp == -1) {
+           return -2; // memory error
+        }
         return temp;
     } else {
-        return -1;
+        return -1; // not-found error
     }
 }
 
@@ -657,7 +684,11 @@ void getBestMove(HunterView hView, char *bestMove, LocationID **draculaPaths, in
         double locationScore = 0;
         for (k = 0; k < NUM_MAP_LOCATIONS; k++) {
             LocationID *path = NULL;
-            locationScore += score[k] / sqrt(shortestPath(hView, adjLocs[i], k, &path));
+            int shortestPathLength = shortestPath(hView, adjLocs[i], k, &path);
+            if (shortestPathLength == -2 || shortestPathLength == -1) {
+                return;
+            }
+            locationScore += score[k] / sqrt(shortestPathLength);
             free(path);
         }
         
