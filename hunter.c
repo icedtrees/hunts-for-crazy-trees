@@ -81,6 +81,7 @@ void decideMove(HunterView hView) {
             for (i = 0; i < previousNumPaths; i ++) {
                 free(previousTrails[i]);
             }
+            free(previousTrails);
             return;
         }
         // Use all possible dracula trails to evaluate a best move
