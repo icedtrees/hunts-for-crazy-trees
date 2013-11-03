@@ -155,6 +155,7 @@ void generateMessage(HunterView hView, char *message) {
 LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID **previousPaths, int *numPaths, int lengthTrail) {
     // Accepts trails of length n as input, and generates trails of length n + 1 as output
     
+    printf("trying to get dracula trails\n");
     
     // Dracula's travel involves a maximum of 8 adjacent cities for every city
     int numPrevious = *numPaths;
@@ -198,18 +199,31 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
         }
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
+            printf("pathIndex is %d\n", pathIndex);
+            printf("previous (future) move was %s\n", names[histories[PLAYER_DRACULA][lengthTrail - 1]]);
             // special move: teleport
             if (histories[PLAYER_DRACULA][lengthTrail - 1] == TELEPORT) {
                 LocationID currentCity;
                 for (currentCity = 0; currentCity < NUM_MAP_LOCATIONS; currentCity ++) {
+                    printf("currentCity is %d\n", currentCity);
+                    printf("trying to malloc %d bytes of memory\n", TRAIL_SIZE * sizeof(LocationID));
+                    fflush(stdout);
                     LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+                    printf("malloced\n");
+                    fflush(stdout);
                     if (newPath == NULL) {
                        return NULL;
                    }
                     memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
                     newPath[lengthTrail] = currentCity;
-                    generatedTrails[*numPaths] = newPath;
-                    *numPaths = *numPaths + 1;
+                    if (validDraculaTrail(histories, newPath)) {
+                        printf("the tp was valid\n");
+                        generatedTrails[*numPaths] = newPath;
+                        *numPaths = *numPaths + 1;
+                        continue;
+                    } else {
+                        free(newPath);
+                    }
                 }
                 continue;
             // special moves: hide, D1
@@ -275,13 +289,13 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             
         }
     }
-
     return generatedTrails;
 }
 
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
     // Given a dracula trail where all cities are adjacent, verifies that it matches histories
     // and all double backs/hides are legitimate
+    
     int depth;
     for (depth = 0; depth < TRAIL_SIZE && trail[depth] != -1; depth ++);
     
@@ -333,7 +347,7 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
                 }
             }
         }
-
+        
         // Check that dracula history matches the location in trail
         if (histories[PLAYER_DRACULA][i] < NUM_MAP_LOCATIONS && histories[PLAYER_DRACULA][i] != trail[i]) {
             return FALSE;
@@ -344,7 +358,7 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
         } else if (trail[i] == ST_JOSEPH_AND_ST_MARYS) { // dracula is banned from church since he is atheist
             return FALSE;
         }
-
+        
         // check that the trail matches the locations of the hunters
         if (histories[PLAYER_DRACULA][i] == CITY_UNKNOWN) {
         PlayerID currentPlayer;
@@ -356,7 +370,6 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
             }
         }
     }
-    
     return TRUE;
 }
 

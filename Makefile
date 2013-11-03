@@ -58,6 +58,10 @@ testHunterView3: $(HUNTER_VIEW_DEPENDENCIES) testHunterView3.c
 testHunterView4: $(HUNTER_VIEW_DEPENDENCIES) testHunterView4.c
 	$(CC) $(CFLAGS) -o testHunterView4 $(HUNTER_VIEW_FILES) testHunterView4.c
 
+# Misc test
+test: $(HUNTER_DEPENDENCIES) test.c
+	$(CC) $(CFLAGS) -o test $(HUNTER_FILES) test.c 
+
 
 # Remove all the temporary files
 clean:
