@@ -232,6 +232,20 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                 }
                 continue;
             }
+
+            // adding possible hide manually
+            LocationID *newPath = malloc(TRAIL_SIZE * sizeof(LocationID));
+            if (newPath == NULL) {
+                return NULL;
+            }
+            memcpy(newPath, previousPaths[pathIndex], TRAIL_SIZE * sizeof(LocationID));
+            newPath[lengthTrail] = newPath[lengthTrail - 1];
+            if (validDraculaTrail(histories, newPath)) {
+                generatedTrails[*numPaths] = newPath;
+                *numPaths = *numPaths + 1;
+            } else {
+                free(newPath);
+            }
             
             LocationID lastCity = previousPaths[pathIndex][lengthTrail - 1];
 
@@ -285,7 +299,6 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
 int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail) {
     // Given a dracula trail where all cities are adjacent, verifies that it matches histories
     // and all double backs/hides are legitimate
-    
     int depth;
     for (depth = 0; depth < TRAIL_SIZE && trail[depth] != -1; depth ++);
     
@@ -331,9 +344,23 @@ int validDraculaTrail(LocationID histories[NUM_PLAYERS][TRAIL_SIZE], int *trail)
         } else {
             // check that the city is not in trail (now BLOOD_TRAIL - 1)
             int j;
-            for (j = i + 1; j < depth && j < i + BLOOD_TRAIL; j ++) {
+            int hideCount = 0;
+            int lastHide = -1;
+            for (j = i + 1; j < depth; j ++) {
                 if (trail[i] == trail[j] && histories[PLAYER_DRACULA][j] < HIDE) { // also standard move
-                    return FALSE;
+                    hideCount ++;
+                    lastHide = j;
+                    if (hideCount == 2 && j - lastHide == 6) {
+                        lastHide = j;
+                        hideCount = 1;
+                    }
+                    if (hideCount == 1 && j - lastHide == 6) {
+                        lastHide = -1;
+                        hideCount = 0;
+                    }
+                    if (hideCount == 2) {
+                        return FALSE;
+                    }
                 }
             }
         }

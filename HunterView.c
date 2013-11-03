@@ -160,7 +160,7 @@ static void simulateGame(HunterView hunterView, char *pastPlays) {
         LocationID curLoc = getLocation(hunterView, curPlayer);
         LocationID dest = moveID(curPlay[1], curPlay[2]);
         LocationID realDest = dest; //real destination, after evaluating hide, doubleback etc
-        
+
         // these only apply to Dracula
         if (dest == HIDE) {
             realDest = curLoc;

@@ -31,7 +31,7 @@ void registerBestPlay( char *play, playerMessage message ) {}
 
 int main(int argc, char *argv[]) {
     playerMessage messages[] = {};
-    char *pastPlays = "GJM.... SHA.... HGO.... MTO.... DDU.V.. GSJ.... SNS.... HFL.... MSR.... DHIT... GZA.... SED.... HVE.... MSN.... DC?T... GSZ.... SMN.... HMU.... MAL.... DD3T... GKL.... SLO.... HST.... MBO.... DS?.... GCD.... SLV.... HBU.... MNA.... DLVT... GCD.... SLVTD.. HBU.... MNA.... DMNT.V. GGA.... SSW.... HAM.... MLE.... DHIT.M. GCN.... SLO.... HNS.... MEC.... DEDT.M. GBC.... SPL.... HNS.... MEC.... DD3T.M. GBC.... SPL.... HNS.... MEC.... DLOT... GBC.... SPL.... HNS.... MEC.... DSWT... GBC.... SPL.... HNS.... MEC.... DLVT.M. GSZ.... SLOT... HEDT... MLO.... DHI.VM. GZA.... SMNT... HED.... MLO.... DS?.... GZA.... SMN.... HED.... MLO.... DC?T... GZA.... SMN.... HED.... MLO.... DC?T... GZA.... SMN.... HED.... MLO.... DD2T.M. GZA.... SMN.... HED.... MLO.... DTPT.M. GSZ.... SLO.... HNS.... MEC.... DHIT.V. GKL.... SEC.... HNS.... MPL.... DKLT... GKLTD.. SNS.... HHA.... MEC.... DBCT.M. GBCTD.. SNS.... HNS.... MNS.... DC?T.M. GBE.... SNS.... HEC.... MNS.... DC?T.M. GBC.... SNS.... HNS.... MEC.... DD3T.M. GBCTD.. SED.... HED.... MNS.... DHIT.M. GBCTD.. SED.... HED.... MHA.... DKL.V.. GBE.... SED.... HED.... MPR.... DCDT... GKLV... SED.... HLO.... MSZ.... DTPT.M.";
+    char *pastPlays = "GJM.... SHA.... HGO.... MTO.... DLO.V.. GSJ.... SNS.... HFL.... MSR.... DC?T... GZA.... SED.... HVE.... MSN.... DC?T... GSZ.... SMN.... HMU.... MAL.... DS?.... GKL.... SLOV... HLI.... MLS.... DC?T... GCD.... SSW.... HCO.... MAO.... DC?T... GGA.... SIS.... HHA.... MGW.... DC?T...";
     HunterView hView = newHunterView(pastPlays, messages);
     int allHistories[NUM_PLAYERS][TRAIL_SIZE];
     PlayerID currentPlayer;
@@ -39,6 +39,11 @@ int main(int argc, char *argv[]) {
         getHistory(hView, currentPlayer, allHistories[currentPlayer]);
     }
     disposeHunterView(hView);
+
+    int j;
+    for (j = 0; j < 7; j ++) {
+        printf("%s<--", names[allHistories[PLAYER_DRACULA][j]]);
+    }
     
     int numPaths;
     int previousNumPaths;
@@ -48,8 +53,11 @@ int main(int argc, char *argv[]) {
     printf("\ndepth 0:\n");
     printDraculaTrails(draculaTrails, numPaths);
     
+    int maxDepth;
+    for (maxDepth = 0; allHistories[PLAYER_DRACULA][maxDepth] != UNKNOWN_LOCATION; maxDepth ++);
+    
     int depth;
-    for (depth = 1; depth < TRAIL_SIZE; depth ++) {
+    for (depth = 1; depth < maxDepth; depth ++) {
         previousTrails = draculaTrails;
         previousNumPaths = numPaths;
         // Use previous dracula trails to incrementally generate more
@@ -57,10 +65,16 @@ int main(int argc, char *argv[]) {
         // Use all possible dracula trails to evaluate a best move
 
         printf("\ndepth %d:\n", depth);
+        int i;
+        printf("history...\n");
+        for (i = 0; i < depth + 1; i ++) {
+            printf("%s<--", names[allHistories[PLAYER_DRACULA][i]]);
+        }
+        printf("\n");
+        printf("numPaths is %d\n", numPaths);
         printDraculaTrails(draculaTrails, numPaths);
         
         // free previous trails
-        int i;
         for (i = 0; i < previousNumPaths; i ++) {
             free(previousTrails[i]);
         }
