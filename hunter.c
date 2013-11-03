@@ -222,9 +222,11 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
                         *numPaths = *numPaths + 1;
                         continue;
                     } else {
+                        printf("the tp was not valid\n");
                         free(newPath);
                     }
                 }
+                printf("continuing\n");
                 continue;
             // special moves: hide, D1
             } else if (histories[PLAYER_DRACULA][lengthTrail - 1] == HIDE || histories[PLAYER_DRACULA][lengthTrail - 1] == DOUBLE_BACK_1) {
