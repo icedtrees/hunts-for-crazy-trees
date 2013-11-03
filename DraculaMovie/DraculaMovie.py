@@ -50,10 +50,6 @@ class Player(object):
 
 inputSource = raw_input("What input would you like to use?")
 
-# Get move delay
-moveDelay = input("What move delay would you like? (ms)")
-
-
 # Basic display settings
 screen = pygame.display.set_mode((1405, 993))
 pygame.display.set_caption("Dracula: THE MOVIE")
@@ -104,8 +100,11 @@ while True:
         currentMove = pastPlays[startIndex][1]
         if currentMove == "HI":
             pass # no change
-        elif currentMove[0] == "D":
-            pass # yolo
+        elif currentMove[0] == "D" and currentMove[1].isdigit():
+            dbIndex = int(currentMove[1])
+            currentPlayer.currentCity = pastPlays[startIndex - (5 * dbIndex)][1]
+            if currentPlayer.currentCity == "HI":
+                currentPlayer.currentCity = pastPlays[startIndex - (5 * (dbIndex + 1))][1]
         elif currentMove == "TP":
             currentPlayer.currentCity = "CD"
         else:

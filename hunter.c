@@ -76,6 +76,13 @@ void decideMove(HunterView hView) {
         previousNumPaths = numPaths;
         // Use previous dracula trails to incrementally generate more
         draculaTrails = getDraculaTrails(allHistories, previousTrails, &numPaths, depth);
+        if (draculaTrails = NULL) { // ran out of memory
+            int i;
+            for (i = 0; i < previousNumPaths; i ++) {
+                free(previousTrails[i]);
+            }
+            return;
+        }
         // Use all possible dracula trails to evaluate a best move
         getBestMove(hView, bestMove, draculaTrails, numPaths);
 
@@ -178,6 +185,9 @@ LocationID **getDraculaTrails(int histories[NUM_PLAYERS][TRAIL_SIZE], LocationID
             generatedTrails = malloc(numPrevious * sizeof(LocationID *));
         } else {
             generatedTrails = malloc(MAX_ADJACENT_LOCATIONS * numPrevious * sizeof(LocationID *));
+        }
+        if (generatedTrails == NULL) {
+            return NULL;
         }
         int pathIndex;
         for (pathIndex = 0; pathIndex < numPrevious; pathIndex ++) {
